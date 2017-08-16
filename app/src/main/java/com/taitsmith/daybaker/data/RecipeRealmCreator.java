@@ -23,6 +23,7 @@ import okhttp3.Response;
 
 /**
  * Downloads recipe JSON from web, parses it and creates realm objects to be used offline.
+ * Only runs if the app doesn't detect a filled Realm when it starts.
  */
 
 public class RecipeRealmCreator {
@@ -36,11 +37,7 @@ public class RecipeRealmCreator {
         recipeUrl = HttpUrl.parse(context.getString(R.string.recipe_url));
 
         client = new OkHttpClient();
-        realm.init(context);
-
-        realm = Realm.getInstance(MainActivity.realmConfiguration);
-
-        realm.beginTransaction();
+        Realm.init(context);
 
         gson = new Gson();
 
@@ -56,12 +53,16 @@ public class RecipeRealmCreator {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                realm = Realm.getInstance(MainActivity.realmConfiguration);
+
+                realm.beginTransaction();
+
                 try {
                     final String responseData = response.body().string();
                     final JSONArray recipeList = new JSONArray(responseData);
 
                     for (int i = 0; i < recipeList.length(); i++){
-                        Recipe recipe = new Recipe();
+                        Recipe recipe = realm.createObject(Recipe.class);
 
                         JSONObject object = recipeList.getJSONObject(i);
 
@@ -74,15 +75,19 @@ public class RecipeRealmCreator {
                         String steps = gson.toJson(object.getJSONArray("steps"));
                         recipe.setSteps(steps);
 
+                        int servings = object.getInt("servings");
+                        recipe.setServings(servings);
+
                         Log.d("RESULTS NAME ", name);
                         Log.d("RESULTS STEPS ", steps);
                     }
+                    realm.commitTransaction();
+                    realm.close();
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
         });
-
-        realm.close();
     }
 }

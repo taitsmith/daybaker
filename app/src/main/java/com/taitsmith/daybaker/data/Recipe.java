@@ -8,6 +8,15 @@ import io.realm.RealmObject;
 
 public class Recipe extends RealmObject{
     private String name, ingredients, steps;
+    private int servings;
+
+    public int getServings() {
+        return servings;
+    }
+
+    public void setServings(int servings) {
+        this.servings = servings;
+    }
 
     public String getName() {
         return name;

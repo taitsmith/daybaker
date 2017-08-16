@@ -8,15 +8,14 @@
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/recipe_name_tv"
+        android:id="@+id/list_ingredient_name_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="start"/>
 
     <TextView
-        android:id="@+id/recipe_servings_tv"
+        android:id="@+id/list_ingredient_measurement_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"/>
-
+        android:layout_gravity="top|end"/>
 </FrameLayout>

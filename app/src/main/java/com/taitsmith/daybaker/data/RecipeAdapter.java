@@ -9,25 +9,25 @@ import android.widget.TextView;
 
 import com.taitsmith.daybaker.R;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import io.realm.RealmResults;
 
 /**
- *
+ * Your standard recycler view adapter to show the list of recipes.
  */
 
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder> {
     private int numberItems;
-    private JSONArray resultsArray;
+    private RealmResults<Recipe> recipes;
+    final private ListItemClickListener listener;
 
     public interface ListItemClickListener{
-        void onClick(int itemIndex);
+        void onListItemClick(int itemIndex);
     }
 
-    public RecipeAdapter(int items, JSONArray recipeArray){
+    public RecipeAdapter(int items, RealmResults<Recipe> realmResults, ListItemClickListener listener){
         numberItems = items;
-        resultsArray = recipeArray;
+        recipes = realmResults;
+        this.listener = listener;
     }
 
     @Override
@@ -45,26 +45,34 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         implements View.OnClickListener {
 
         final TextView nameTv;
+        final TextView servingsTv;
 
         @Override
         public void onClick(View view) {
-
+            int clickedPosition = getAdapterPosition();
+            listener.onListItemClick(clickedPosition);
         }
 
         RecipeViewHolder(View recipeView) {
             super(recipeView);
             nameTv = recipeView.findViewById(R.id.recipe_name_tv);
+            servingsTv = recipeView.findViewById(R.id.recipe_servings_tv);
+            itemView.setOnClickListener(this);
         }
 
         void bind(int position) {
-            try {
-                JSONObject recipe = resultsArray.getJSONObject(position);
-                String name = recipe.getString("name");
-                nameTv.setText(name);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            Recipe recipe = recipes.get(position);
+
+            String name = recipe.getName();
+
+            int servings = recipe.getServings();
+            String servingString = itemView.getResources().getString(R.string.serves, servings);
+
+            nameTv.setText(name);
+            servingsTv.setText(servingString);
         }
+
+
     }
 
     @Override
@@ -74,6 +82,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
     @Override
     public int getItemCount() {
-        return resultsArray.length();
+        return numberItems;
     }
 }
