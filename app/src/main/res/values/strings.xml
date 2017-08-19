@@ -2,4 +2,9 @@
     <string name="app_name">DayBaker</string>
     <string name="recipe_url">https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json</string>
     <string name="serves">Serves: %1$d</string>
+    <string name="ingredient_summary_description">Here\'s your list of ingredients! Be sure to
+        collect everything, then click the button to see the steps.</string>
+    <string name="step_summary_description">Here\'s a brief summary of the necessary steps to make
+        %1$s. Select a step to see it in more detail. Some steps will include a video. Select the back
+        button to return to this menu or swipe left or right to cycle through steps.</string>
 </resources>

@@ -1,10 +1,12 @@
 package com.taitsmith.daybaker.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.Button;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -17,12 +19,15 @@ import com.taitsmith.daybaker.data.Recipe;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
-public class RecipeSummaryActivity extends AppCompatActivity {
+public class IngredientSummaryActivity extends AppCompatActivity {
     @BindView(R.id.rv_ingredients)
     RecyclerView ingredientRecycler;
+    @BindView(R.id.continueButton)
+    Button continueButton;
 
     Realm realm;
     String recipeName;
@@ -98,6 +103,13 @@ public class RecipeSummaryActivity extends AppCompatActivity {
 
             Log.d("INGREDIENT ", ingredient);
         }
+    }
+
+    @OnClick(R.id.continueButton)
+    public void seeSteps(){
+        Intent intent = new Intent(this, StepSummaryActivity.class);
+        intent.putExtra("recipe_name", recipeName);
+        startActivity(intent);
     }
 }
 

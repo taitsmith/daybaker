@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity
     public static RealmConfiguration realmConfiguration;
     private RecipeAdapter recipeAdapter;
     RealmResults<Recipe> recipes;
+    private Recipe recipe;
 
     @BindView(R.id.rv_recipes)
     RecyclerView recipeRecycler;
@@ -69,8 +70,8 @@ public class MainActivity extends AppCompatActivity
     //include the name of the recipeName selected.
     @Override
     public void onListItemClick(int itemIndex) {
-        Recipe recipe = recipes.get(itemIndex);
-        Intent intent = new Intent(this, RecipeSummaryActivity.class);
+        recipe = recipes.get(itemIndex);
+        Intent intent = new Intent(this, IngredientSummaryActivity.class);
         intent.putExtra("recipe_name", recipe.getName());
         startActivity(intent);
     }
