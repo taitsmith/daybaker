@@ -2,10 +2,12 @@ package com.taitsmith.daybaker.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -13,6 +15,7 @@ import com.google.gson.JsonParser;
 import com.taitsmith.daybaker.R;
 import com.taitsmith.daybaker.data.Recipe;
 import com.taitsmith.daybaker.data.StepAdapter;
+import com.taitsmith.daybaker.fragments.StepDetailFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,6 +31,7 @@ public class StepSummaryActivity extends AppCompatActivity implements StepAdapte
     StepAdapter adapter;
     RealmResults<Recipe> results;
     public JsonArray stepArray;
+    private boolean isTwoPane;
 
     @BindView(R.id.stepSummaryRecycler)
     RecyclerView stepRecycler;
@@ -45,6 +49,10 @@ public class StepSummaryActivity extends AppCompatActivity implements StepAdapte
         if (getIntent().hasExtra("recipe_name")){
             name = getIntent().getStringExtra("recipe_name");
         }
+
+        isTwoPane = findViewById(R.id.stepDetailFragment) != null;
+
+        Toast.makeText(this, Boolean.toString(isTwoPane), Toast.LENGTH_SHORT).show();
 
         summaryDescription.setText(getString(R.string.step_summary_description, name));
 
@@ -71,8 +79,20 @@ public class StepSummaryActivity extends AppCompatActivity implements StepAdapte
 
     @Override
     public void onListItemClick(int itemIndex, JsonObject stepObject) {
-        Intent intent = new Intent(this, StepDetailActivity.class);
-        intent.putExtra("step", stepObject.toString());
-        startActivity(intent);
+
+        if (isTwoPane){
+            StepDetailFragment fragment = new StepDetailFragment();
+            FragmentManager manager = getSupportFragmentManager();
+
+            fragment.setText(stepObject.get("description").getAsString());
+
+            manager.beginTransaction()
+                    .replace(R.id.stepDetailFragment, fragment)
+                    .commit();
+        } else {
+            Intent intent = new Intent(this, StepDetailActivity.class);
+            intent.putExtra("step", stepObject.toString());
+            startActivity(intent);
+        }
     }
 }

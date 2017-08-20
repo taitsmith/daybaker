@@ -74,5 +74,6 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(this, IngredientSummaryActivity.class);
         intent.putExtra("recipe_name", recipe.getName());
         startActivity(intent);
+
     }
 }

@@ -4,11 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.taitsmith.daybaker.activities.StepDetailActivity">
+    tools:context="com.taitsmith.daybaker.activities.MainActivity"
+    android:background="@color/colorAccent">
 
-    <FrameLayout
-        android:id="@+id/stepDetailFragmentPortrait"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_recipes"
+        android:layout_width="784dp"
+        android:layout_height="1127dp"
+        tools:layout_editor_absoluteY="8dp"
+        tools:layout_editor_absoluteX="8dp" />
 
 </android.support.constraint.ConstraintLayout>
