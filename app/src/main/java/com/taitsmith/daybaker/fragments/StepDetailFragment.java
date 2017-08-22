@@ -40,7 +40,7 @@ public class StepDetailFragment extends Fragment {
     @BindView(R.id.step_video_player)
     SimpleExoPlayerView playerView;
     @BindView(R.id.step_fragment_name_view)
-    TextView nameView;
+    TextView stepDetailTv;
 
     public StepDetailFragment(){}
 
@@ -52,10 +52,10 @@ public class StepDetailFragment extends Fragment {
             if (videoUri != null) {
                 videoUri = Uri.parse(savedInstanceState.get("VIDEO_URI").toString());
             }
-            description = savedInstanceState.getString("DESCRIPTION");
+            shortDescription = savedInstanceState.getString("DESCRIPTION");
         } else {
             videoUri = null;
-            description = getString(R.string.step_detail_fragment_default);
+            shortDescription = getString(R.string.step_detail_fragment_default);
         }
     }
 
@@ -65,7 +65,7 @@ public class StepDetailFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_step, container, false);
         ButterKnife.bind(this, rootView);
 
-        nameView.setText(shortDescription);
+        stepDetailTv.setText(shortDescription);
         initializePlayer(videoUri);
 
         return rootView;
@@ -115,11 +115,15 @@ public class StepDetailFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+
         if (videoUri == null){
             uriString = "";
+        } else {
+            uriString = videoUri.toString();
         }
+
         outState.putString("VIDEO_URI", uriString);
-        outState.putString("DESCRIPTION", description);
+        outState.putString("DESCRIPTION", shortDescription);
         super.onSaveInstanceState(outState);
     }
 }

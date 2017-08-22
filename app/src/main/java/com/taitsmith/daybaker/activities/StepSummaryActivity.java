@@ -7,11 +7,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.taitsmith.daybaker.R;
 import com.taitsmith.daybaker.data.Recipe;
-import com.taitsmith.daybaker.data.StepAdapter;
 import com.taitsmith.daybaker.fragments.StepDetailFragment;
 import com.taitsmith.daybaker.fragments.StepListFragment;
 
@@ -22,7 +22,7 @@ import io.realm.RealmResults;
 
 import static com.taitsmith.daybaker.activities.MainActivity.realmConfiguration;
 
-public class StepSummaryActivity extends AppCompatActivity implements StepAdapter.ListItemClickListener {
+public class StepSummaryActivity extends AppCompatActivity implements StepListFragment.OnStepClickListener {
     private String recipeName;
     private Realm realm;
     private Recipe recipe;
@@ -31,7 +31,7 @@ public class StepSummaryActivity extends AppCompatActivity implements StepAdapte
     private StepListFragment stepListFragment;
     private StepDetailFragment stepDetailFragment;
     private JsonObject stepObject;
-    public JsonArray stepArray;
+    public static JsonArray stepArray;
     private boolean isTwoPane;
 
     @BindView(R.id.stepSummaryDescription)
@@ -66,6 +66,8 @@ public class StepSummaryActivity extends AppCompatActivity implements StepAdapte
 
         stepObject = parser.parse(steps).getAsJsonObject();
 
+        stepArray = stepObject.get("values").getAsJsonArray();
+
         manager.beginTransaction()
                .add(R.id.stepListFragment, stepListFragment)
                .commit();
@@ -86,7 +88,11 @@ public class StepSummaryActivity extends AppCompatActivity implements StepAdapte
     }
 
     @Override
-    public void onListItemClick(int itemIndex, JsonObject stepObject) {
+    public void onStepSelected(int position) {
+        JsonElement element = stepArray.get(position);
+        JsonObject object = element.getAsJsonObject();
+        JsonElement element1 = object.get("nameValuePairs");
+        stepObject = element1.getAsJsonObject();
 
         if (isTwoPane){
             stepDetailFragment = new StepDetailFragment();
@@ -112,6 +118,4 @@ public class StepSummaryActivity extends AppCompatActivity implements StepAdapte
             super.onSaveInstanceState(outState);
         }
     }
-
-
 }

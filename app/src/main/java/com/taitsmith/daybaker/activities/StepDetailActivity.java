@@ -30,7 +30,7 @@ public class StepDetailActivity extends AppCompatActivity {
 
         FragmentManager manager = getSupportFragmentManager();
         manager.beginTransaction()
-                .add(R.id.stepDetailFragment, detailFragment)
+                .replace(R.id.stepDetailFragment, detailFragment)
                 .commit();
     }
 }
