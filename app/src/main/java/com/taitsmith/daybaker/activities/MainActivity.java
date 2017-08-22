@@ -3,25 +3,26 @@ package com.taitsmith.daybaker.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.TextView;
 
 import com.taitsmith.daybaker.R;
 import com.taitsmith.daybaker.data.Recipe;
 import com.taitsmith.daybaker.data.RecipeAdapter;
-import com.taitsmith.daybaker.data.RecipeRealmCreator;
 
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.Realm;
-import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
+
+import static com.taitsmith.daybaker.activities.BaseActivity.realmConfiguration;
 
 public class MainActivity extends AppCompatActivity
     implements RecipeAdapter.ListItemClickListener {
     private Realm recipeRealm;
-    public static RealmConfiguration realmConfiguration;
     private RecipeAdapter recipeAdapter;
     RealmResults<Recipe> recipes;
     private Recipe recipe;
@@ -30,30 +31,23 @@ public class MainActivity extends AppCompatActivity
     RecyclerView recipeRecycler;
     @BindString(R.string.recipe_url)
     String recipeListString;
+    @BindView(R.id.errorTV)
+    TextView errorTv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
-        Realm.init(this);
-
-        realmConfiguration = new RealmConfiguration.Builder()
-                .name("recipeRealm.recipeRealm")
-                .build();
-
         recipeRealm = Realm.getInstance(realmConfiguration);
 
-        if (recipeRealm.isEmpty()) {
-            RecipeRealmCreator creator = new RecipeRealmCreator();
-            creator.downloadRecipeData(this);
-        }
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recipeRecycler.setLayoutManager(layoutManager);
 
         recipeRecycler.setHasFixedSize(true);
+
+        errorTv.setVisibility(View.INVISIBLE);
 
         fillRecycler();
     }

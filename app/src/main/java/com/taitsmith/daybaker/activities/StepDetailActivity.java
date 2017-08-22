@@ -26,7 +26,7 @@ public class StepDetailActivity extends AppCompatActivity {
 
         StepDetailFragment detailFragment = new StepDetailFragment();
         detailFragment.setVideoUri(step.get("videoURL").getAsString());
-        detailFragment.setShortDescription(step.get("description").getAsString());
+        detailFragment.setDescription(step.get("description").getAsString());
 
         FragmentManager manager = getSupportFragmentManager();
         manager.beginTransaction()

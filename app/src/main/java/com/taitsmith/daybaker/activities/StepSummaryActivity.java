@@ -20,7 +20,7 @@ import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
-import static com.taitsmith.daybaker.activities.MainActivity.realmConfiguration;
+import static com.taitsmith.daybaker.activities.BaseActivity.realmConfiguration;
 
 public class StepSummaryActivity extends AppCompatActivity implements StepListFragment.OnStepClickListener {
     private String recipeName;
@@ -43,6 +43,7 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_step_summary);
         ButterKnife.bind(this);
+
         realm = Realm.getInstance(realmConfiguration);
         manager = getSupportFragmentManager();
         JsonParser parser = new JsonParser();
@@ -72,33 +73,34 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
                .add(R.id.stepListFragment, stepListFragment)
                .commit();
 
+        stepDetailFragment = new StepDetailFragment();
+
         if (isTwoPane) {
            if (savedInstanceState != null) {
-                  stepDetailFragment = (StepDetailFragment) getSupportFragmentManager()
-                          .getFragment(savedInstanceState, "DETAIL_FRAGMENT");
+               stepDetailFragment.setDescription(savedInstanceState.getString("DESCRIPTION"));
+               stepDetailFragment.setVideoUri(savedInstanceState.getString("VIDEO_URL"));
+               stepObject = parser.parse(savedInstanceState.getString("STEP_OBJECT")).getAsJsonObject();
            } else {
-               stepDetailFragment = new StepDetailFragment();
                stepDetailFragment.setVideoUri("");
-               stepDetailFragment.setShortDescription(getString(R.string.step_detail_fragment_default));
+               stepDetailFragment.setDescription(getString(R.string.step_detail_fragment_default));
+           }
                manager.beginTransaction()
                        .add(R.id.stepDetailFragment, stepDetailFragment)
                        .commit();
-           }
         }
     }
 
     @Override
     public void onStepSelected(int position) {
-        JsonElement element = stepArray.get(position);
-        JsonObject object = element.getAsJsonObject();
-        JsonElement element1 = object.get("nameValuePairs");
-        stepObject = element1.getAsJsonObject();
+        stepObject = stepArray.get(position).getAsJsonObject();
+        JsonElement element = stepObject.get("nameValuePairs");
+        stepObject = element.getAsJsonObject();
 
         if (isTwoPane){
             stepDetailFragment = new StepDetailFragment();
             FragmentManager manager = getSupportFragmentManager();
 
-            stepDetailFragment.setShortDescription(stepObject.get("description").getAsString());
+            stepDetailFragment.setDescription(stepObject.get("description").getAsString());
             stepDetailFragment.setVideoUri(stepObject.get("videoURL").getAsString());
 
             manager.beginTransaction()
@@ -114,7 +116,9 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         if (isTwoPane) {
-            getSupportFragmentManager().putFragment(outState, "DETAIL_FRAGMENT", stepDetailFragment);
+            outState.putString("STEP_OBJECT", stepObject.toString());
+            outState.putString("DESCRIPTION", stepObject.get("description").getAsString());
+            outState.putString("VIDEO_URL", stepObject.get("videoURL").getAsString());
             super.onSaveInstanceState(outState);
         }
     }

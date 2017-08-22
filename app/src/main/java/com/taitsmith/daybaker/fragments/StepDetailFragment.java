@@ -1,6 +1,5 @@
 package com.taitsmith.daybaker.fragments;
 
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -32,7 +32,7 @@ import butterknife.ButterKnife;
  */
 
 public class StepDetailFragment extends Fragment {
-    private String shortDescription, description;
+    private String shortDescription;
     private Uri videoUri;
     private String uriString;
     private SimpleExoPlayer player;
@@ -41,6 +41,8 @@ public class StepDetailFragment extends Fragment {
     SimpleExoPlayerView playerView;
     @BindView(R.id.step_fragment_name_view)
     TextView stepDetailTv;
+    @BindView(R.id.noVideoImageView)
+    ImageView noVideoIv;
 
     public StepDetailFragment(){}
 
@@ -50,7 +52,7 @@ public class StepDetailFragment extends Fragment {
 
         if (savedInstanceState != null){
             if (videoUri != null) {
-                videoUri = Uri.parse(savedInstanceState.get("VIDEO_URI").toString());
+                videoUri = Uri.parse(savedInstanceState.getString("VIDEO_URI"));
             }
             shortDescription = savedInstanceState.getString("DESCRIPTION");
         } else {
@@ -71,12 +73,8 @@ public class StepDetailFragment extends Fragment {
         return rootView;
     }
 
-    public void setShortDescription(String shortDesc) {
+    public void setDescription(String shortDesc) {
         shortDescription = shortDesc;
-    }
-
-    public void setDescription(String desc){
-        description = desc;
     }
 
     public void setVideoUri(String url){
@@ -91,11 +89,12 @@ public class StepDetailFragment extends Fragment {
             player = ExoPlayerFactory.newSimpleInstance(getContext(), selector, control);
             playerView.setPlayer(player);
             String agent = Util.getUserAgent(getContext(), "DayBaker");
+
             if (videoUri == null || videoUri.toString().equals("")) {
-                playerView.setDefaultArtwork(BitmapFactory.decodeResource(
-                        getResources(), R.drawable.sad
-                ));
+                hidePlayer(true);
             } else {
+                hidePlayer(false);
+
                 MediaSource source = new ExtractorMediaSource(videoUri, new DefaultDataSourceFactory(
                         getContext(), agent), new DefaultExtractorsFactory(), null, null);
                 player.prepare(source);
@@ -125,5 +124,15 @@ public class StepDetailFragment extends Fragment {
         outState.putString("VIDEO_URI", uriString);
         outState.putString("DESCRIPTION", shortDescription);
         super.onSaveInstanceState(outState);
+    }
+
+    public void hidePlayer(boolean hide) {
+        if (hide) {
+            playerView.setVisibility(View.INVISIBLE);
+            noVideoIv.setVisibility(View.VISIBLE);
+        } else {
+            playerView.setVisibility(View.VISIBLE);
+            noVideoIv.setVisibility(View.INVISIBLE);
+        }
     }
 }

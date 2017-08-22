@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.taitsmith.daybaker.R;
-import com.taitsmith.daybaker.activities.MainActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,6 +19,8 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
+import static com.taitsmith.daybaker.activities.BaseActivity.realmConfiguration;
 
 /**
  * Downloads recipe JSON from web, parses it and creates realm objects to be used offline.
@@ -53,7 +54,7 @@ public class RecipeRealmCreator {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                realm = Realm.getInstance(MainActivity.realmConfiguration);
+                realm = Realm.getInstance(realmConfiguration);
 
                 realm.beginTransaction();
 

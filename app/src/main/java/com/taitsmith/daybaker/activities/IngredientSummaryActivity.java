@@ -20,6 +20,8 @@ import butterknife.OnClick;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
+import static com.taitsmith.daybaker.activities.BaseActivity.realmConfiguration;
+
 public class IngredientSummaryActivity extends AppCompatActivity {
     @BindView(R.id.rv_ingredients)
     RecyclerView ingredientRecycler;
@@ -37,7 +39,7 @@ public class IngredientSummaryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_recipe_summary);
         ButterKnife.bind(this);
 
-        realm = Realm.getInstance(MainActivity.realmConfiguration);
+        realm = Realm.getInstance(realmConfiguration);
 
         if (getIntent().hasExtra("recipe_name")) {
             recipeName = getIntent().getStringExtra("recipe_name");

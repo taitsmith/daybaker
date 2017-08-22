@@ -39,7 +39,6 @@ public class MasterListAdapter extends BaseAdapter {
             textView.setPadding(8, 16, 8, 16);
             textView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-            textView.setBackgroundColor(context.getResources().getColor(R.color.colorPrimaryDark));
         } else {
             textView = (TextView) view;
         }
