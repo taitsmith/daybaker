@@ -7,7 +7,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Button;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -30,7 +29,6 @@ public class IngredientSummaryActivity extends AppCompatActivity {
     Realm realm;
     String recipeName;
     Recipe recipe;
-    Gson gson;
     IngredientAdapter adapter;
 
     @Override

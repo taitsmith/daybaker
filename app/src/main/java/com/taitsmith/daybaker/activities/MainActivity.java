@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     //get the clicked recipeName and start the detail activity
-    //include the name of the recipeName selected.
+    //include the recipeName of the recipeName selected.
     @Override
     public void onListItemClick(int itemIndex) {
         recipe = recipes.get(itemIndex);

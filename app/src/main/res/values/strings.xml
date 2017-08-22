@@ -7,4 +7,5 @@
     <string name="step_summary_description">Here\'s a brief summary of the necessary steps to make
         %1$s. Select a step to see it in more detail. Some steps will include a video. Select the back
         button to return to this menu or swipe left or right to cycle through steps.</string>
+    <string name="step_detail_fragment_default">Select a step to view more information.</string>
 </resources>

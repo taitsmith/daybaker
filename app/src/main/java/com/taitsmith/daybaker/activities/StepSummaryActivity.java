@@ -4,10 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -16,6 +13,7 @@ import com.taitsmith.daybaker.R;
 import com.taitsmith.daybaker.data.Recipe;
 import com.taitsmith.daybaker.data.StepAdapter;
 import com.taitsmith.daybaker.fragments.StepDetailFragment;
+import com.taitsmith.daybaker.fragments.StepListFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,16 +23,17 @@ import io.realm.RealmResults;
 import static com.taitsmith.daybaker.activities.MainActivity.realmConfiguration;
 
 public class StepSummaryActivity extends AppCompatActivity implements StepAdapter.ListItemClickListener {
-    String name;
-    Realm realm;
-    Recipe recipe;
-    StepAdapter adapter;
-    RealmResults<Recipe> results;
+    private String recipeName;
+    private Realm realm;
+    private Recipe recipe;
+    private RealmResults<Recipe> results;
+    private FragmentManager manager;
+    private StepListFragment stepListFragment;
+    private StepDetailFragment stepDetailFragment;
+    private JsonObject stepObject;
     public JsonArray stepArray;
     private boolean isTwoPane;
 
-    @BindView(R.id.stepSummaryRecycler)
-    RecyclerView stepRecycler;
     @BindView(R.id.stepSummaryDescription)
     TextView summaryDescription;
 
@@ -45,49 +44,59 @@ public class StepSummaryActivity extends AppCompatActivity implements StepAdapte
         setContentView(R.layout.activity_step_summary);
         ButterKnife.bind(this);
         realm = Realm.getInstance(realmConfiguration);
+        manager = getSupportFragmentManager();
+        JsonParser parser = new JsonParser();
+        stepListFragment = new StepListFragment();
 
         if (getIntent().hasExtra("recipe_name")){
-            name = getIntent().getStringExtra("recipe_name");
+            recipeName = getIntent().getStringExtra("recipe_name");
         }
 
         isTwoPane = findViewById(R.id.stepDetailFragment) != null;
 
-        Toast.makeText(this, Boolean.toString(isTwoPane), Toast.LENGTH_SHORT).show();
-
-        summaryDescription.setText(getString(R.string.step_summary_description, name));
+        summaryDescription.setText(getString(R.string.step_summary_description, recipeName));
 
         results = realm.where(Recipe.class)
-                .equalTo("name", name)
-                .findAll();
+            .equalTo("name", recipeName)
+            .findAll();
 
         recipe = results.first();
 
         String steps = recipe.getSteps();
 
-        JsonParser parser = new JsonParser();
+        stepObject = parser.parse(steps).getAsJsonObject();
 
-        JsonObject stepObject = parser.parse(steps).getAsJsonObject();
+        manager.beginTransaction()
+               .add(R.id.stepListFragment, stepListFragment)
+               .commit();
 
-        stepArray = stepObject.get("values").getAsJsonArray();
-
-        LinearLayoutManager manager = new LinearLayoutManager(this);
-        stepRecycler.setLayoutManager(manager);
-
-        adapter = new StepAdapter(stepArray.size(), stepArray, this);
-        stepRecycler.setAdapter(adapter);
+        if (isTwoPane) {
+           if (savedInstanceState != null) {
+                  stepDetailFragment = (StepDetailFragment) getSupportFragmentManager()
+                          .getFragment(savedInstanceState, "DETAIL_FRAGMENT");
+           } else {
+               stepDetailFragment = new StepDetailFragment();
+               stepDetailFragment.setVideoUri("");
+               stepDetailFragment.setShortDescription(getString(R.string.step_detail_fragment_default));
+               manager.beginTransaction()
+                       .add(R.id.stepDetailFragment, stepDetailFragment)
+                       .commit();
+           }
+        }
     }
 
     @Override
     public void onListItemClick(int itemIndex, JsonObject stepObject) {
 
         if (isTwoPane){
-            StepDetailFragment fragment = new StepDetailFragment();
+            stepDetailFragment = new StepDetailFragment();
             FragmentManager manager = getSupportFragmentManager();
 
-            fragment.setText(stepObject.get("description").getAsString());
+            stepDetailFragment.setShortDescription(stepObject.get("description").getAsString());
+            stepDetailFragment.setVideoUri(stepObject.get("videoURL").getAsString());
 
             manager.beginTransaction()
-                    .replace(R.id.stepDetailFragment, fragment)
+                    .replace(R.id.stepDetailFragment, stepDetailFragment)
                     .commit();
         } else {
             Intent intent = new Intent(this, StepDetailActivity.class);
@@ -95,4 +104,14 @@ public class StepSummaryActivity extends AppCompatActivity implements StepAdapte
             startActivity(intent);
         }
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        if (isTwoPane) {
+            getSupportFragmentManager().putFragment(outState, "DETAIL_FRAGMENT", stepDetailFragment);
+            super.onSaveInstanceState(outState);
+        }
+    }
+
+
 }
