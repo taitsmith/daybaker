@@ -20,8 +20,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.IngredientSummaryActivity" />
-        <activity android:name=".activities.StepSummaryActivity" />
-        <activity android:name=".activities.StepDetailActivity" />
+        <activity android:name=".activities.StepSummaryActivity"
+            android:launchMode="singleTop"/>
+        <activity android:name=".activities.StepDetailActivity"/>
 
         <receiver android:name=".data.StepWidget">
             <intent-filter>

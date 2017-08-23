@@ -15,7 +15,8 @@ import com.taitsmith.daybaker.activities.StepSummaryActivity;
  * Implementation of App Widget functionality.
  */
 public class StepWidget extends AppWidgetProvider {
-    public static String step;
+    public static String stepObject;
+    public static String recipeName;
     public static String videoUrl;
     public static String stepDescription;
 
@@ -30,7 +31,8 @@ public class StepWidget extends AppWidgetProvider {
         Intent intent = new Intent(context, StepSummaryActivity.class);
         intent.putExtra("DESCRIPTION", stepDescription);
         intent.putExtra("VIDEO_URL", videoUrl);
-        intent.putExtra("RECIPE_NAME", step);
+        intent.putExtra("RECIPE_NAME", recipeName);
+        intent.putExtra("STEP_STRING", stepObject);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
         views.setOnClickPendingIntent(R.id.step_text, pendingIntent);
 

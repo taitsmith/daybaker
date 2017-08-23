@@ -15,15 +15,22 @@
         include a very sad looking Android instead. Add a widget to your home screen to
         keep you updated on your current step and return to this page.</string>
 
-    <!-- nah this should go away -->
-    <string name="step_detail_fragment_default">Select a step to view more information.</string>
-
     <!-- widget stuff -->
     <string name="widget_toast_hello">Happy baking!</string>
+    <string name="appwidget_text">View a recipe\'s to see them here.</string>
+    <string name="add_widget">Add widget</string>
 
     <!-- just in case.-->
     <string name="no_network_error">Uh oh! Something seems to have gone wrong. Check your network
         connection and try again.</string>
-    <string name="appwidget_text">EXAMPLE</string>
-    <string name="add_widget">Add widget</string>
+
+    <!-- strings for fiddling with JSON  -->
+    <string name="nameValuePairs">nameValuePairs</string>
+    <string name="values">values</string>
+    <string name="videoURL">videoURL</string>
+    <string name="description">description</string>
+    <string name="servings">servings</string>
+    <string name="ingredients">ingredients</string>
+    <string name="steps">steps</string>
+    <string name="name">name</string>
 </resources>

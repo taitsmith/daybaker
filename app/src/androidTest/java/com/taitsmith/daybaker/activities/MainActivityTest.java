@@ -55,14 +55,14 @@ public class MainActivityTest {
         appCompatButton.perform(click());
 
         ViewInteraction textView2 = onView(
-                allOf(withId(R.id.step_fragment_name_view), withText("Select a step to view more information."),
+                allOf(withId(R.id.step_fragment_name_view), withText("Select a recipeName to view more information."),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.stepDetailFragment),
                                         0),
                                 1),
                         isDisplayed()));
-        textView2.check(matches(withText("Select a step to view more information.")));
+        textView2.check(matches(withText("Select a recipeName to view more information.")));
 
     }
 

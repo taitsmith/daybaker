@@ -67,51 +67,59 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
         recipe = results.first();
 
         String steps = recipe.getSteps();
-        stepObject = parser.parse(steps).getAsJsonObject();
-        stepArray = stepObject.get("values").getAsJsonArray();
-
-
+        JsonObject object = parser.parse(steps).getAsJsonObject();
+        stepArray = object.get(getString(R.string.values)).getAsJsonArray();
         manager.beginTransaction()
-               .add(R.id.stepListFragment, stepListFragment)
-               .commit();
+                .replace(R.id.stepListFragment, stepListFragment)
+                .commit();
+
+        stepDetailFragment = new StepDetailFragment();
+
+        if(!isTwoPane && getIntent().hasExtra("DESCRIPTION")){
+            Intent intent = new Intent(this, StepDetailActivity.class);
+            intent.putExtra("DESCRIPTION", getIntent().getStringExtra("DESCRIPTION"));
+            intent.putExtra("VIDEO_URL", getIntent().getStringExtra("VIDEO_URL"));
+            startActivity(intent);
+        }
 
         if (isTwoPane) {
-            if (getIntent().hasExtra("DESCRIPTION") && getIntent().hasExtra("VIDEO_URL")) {
-                stepDetailFragment.setDescription(getIntent().getStringExtra("DESCRIPTION"));
-                stepDetailFragment.setVideoUri(getIntent().getStringExtra("VIDEO_URL"));
-            } else if (savedInstanceState != null) {
+            if (savedInstanceState != null) {
                 stepDetailFragment.setDescription(savedInstanceState.getString("DESCRIPTION"));
                 stepDetailFragment.setVideoUri(savedInstanceState.getString("VIDEO_URL"));
                 stepObject = parser.parse(savedInstanceState.getString("STEP_OBJECT")).getAsJsonObject();
+            }else if (getIntent().hasExtra("DESCRIPTION")) {
+                stepDetailFragment.setDescription(getIntent().getStringExtra("DESCRIPTION"));
+                stepDetailFragment.setVideoUri(getIntent().getStringExtra("VIDEO_URL"));
+                stepObject = parser.parse(getIntent().getStringExtra("STEP_STRING")).getAsJsonObject();
             } else {
                 stepObject = stepArray.get(0).getAsJsonObject();
-                JsonElement element = stepObject.get("nameValuePairs");
+                JsonElement element = stepObject.get(getString(R.string.nameValuePairs));
                 stepObject = element.getAsJsonObject();
-                stepDetailFragment.setVideoUri(stepObject.get("videoURL").getAsString());
-                stepDetailFragment.setDescription(stepObject.get("description").getAsString());
+                stepDetailFragment.setVideoUri(stepObject.get(getString(R.string.videoURL)).getAsString());
+                stepDetailFragment.setDescription(stepObject.get(getString(R.string.description)).getAsString());
             }
             manager.beginTransaction()
-                    .replace(R.id.stepDetailFragment, stepDetailFragment)
-                    .commit();
+                .replace(R.id.stepDetailFragment, stepDetailFragment)
+                .commit();
         }
-
     }
 
     @Override
     public void onStepSelected(int position) {
         stepObject = stepArray.get(position).getAsJsonObject();
-        JsonElement element = stepObject.get("nameValuePairs");
+        JsonElement element = stepObject.get(getString(R.string.nameValuePairs));
         stepObject = element.getAsJsonObject();
 
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, StepWidget.class));
 
-        String description = stepObject.get("description").getAsString();
-        String videoUrl = stepObject.get("videoURL").getAsString();
+        String description = stepObject.get(getString(R.string.description)).getAsString();
+        String videoUrl = stepObject.get(getString(R.string.videoURL)).getAsString();
 
         StepWidget.stepDescription = description;
         StepWidget.videoUrl = videoUrl;
-        StepWidget.step = recipeName;
+        StepWidget.recipeName = recipeName;
+        StepWidget.stepObject = stepObject.toString();
 
         StepWidget.updateWidgetText(this, appWidgetManager, appWidgetIds, description);
 
@@ -125,7 +133,7 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
                     .commit();
         } else {
             Intent intent = new Intent(this, StepDetailActivity.class);
-            intent.putExtra("step", stepObject.toString());
+            intent.putExtra("RECIPE_NAME", stepObject.toString());
             startActivity(intent);
         }
     }
@@ -134,8 +142,8 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
     protected void onSaveInstanceState(Bundle outState) {
         if (isTwoPane) {
             outState.putString("STEP_OBJECT", stepObject.toString());
-            outState.putString("DESCRIPTION", stepObject.get("description").getAsString());
-            outState.putString("VIDEO_URL", stepObject.get("videoURL").getAsString());
+            outState.putString("DESCRIPTION", stepObject.get(getString(R.string.description)).getAsString());
+            outState.putString("VIDEO_URL", stepObject.get(getString(R.string.videoURL)).getAsString());
             super.onSaveInstanceState(outState);
         }
     }

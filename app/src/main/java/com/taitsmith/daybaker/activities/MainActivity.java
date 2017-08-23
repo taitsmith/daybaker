@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity
     private RecipeAdapter recipeAdapter;
     RealmResults<Recipe> recipes;
     private Recipe recipe;
+    public static boolean showError;
 
     @BindView(R.id.rv_recipes)
     RecyclerView recipeRecycler;
@@ -68,6 +69,11 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(this, IngredientSummaryActivity.class);
         intent.putExtra("recipe_name", recipe.getName());
         startActivity(intent);
+    }
 
+    public void showError(boolean show){
+        if (show) {
+            recipeRecycler.setVisibility(View.INVISIBLE);
+        }
     }
 }

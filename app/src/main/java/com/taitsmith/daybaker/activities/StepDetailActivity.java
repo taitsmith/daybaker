@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.taitsmith.daybaker.R;
+import com.taitsmith.daybaker.data.StepWidget;
 import com.taitsmith.daybaker.fragments.StepDetailFragment;
 
 public class StepDetailActivity extends AppCompatActivity {
@@ -18,17 +19,21 @@ public class StepDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_step_detail);
         parser = new JsonParser();
-
-        if (getIntent().hasExtra("step")){
-            String stepString = getIntent().getStringExtra("step");
-            step = parser.parse(stepString).getAsJsonObject();
-        }
-
         StepDetailFragment detailFragment = new StepDetailFragment();
-        detailFragment.setVideoUri(step.get("videoURL").getAsString());
-        detailFragment.setDescription(step.get("description").getAsString());
-
         FragmentManager manager = getSupportFragmentManager();
+
+
+
+
+        if (getIntent().hasExtra("VIDEO_URL")){
+            detailFragment.setDescription(StepWidget.stepDescription);
+            detailFragment.setVideoUri(StepWidget.videoUrl);
+        } else if (getIntent().hasExtra("RECIPE_NAME")){
+            String stepString = getIntent().getStringExtra("RECIPE_NAME");
+            step = parser.parse(stepString).getAsJsonObject();
+            detailFragment.setVideoUri(step.get(getString(R.string.videoURL)).getAsString());
+            detailFragment.setDescription(step.get(getString(R.string.description)).getAsString());
+        }
         manager.beginTransaction()
                 .replace(R.id.stepDetailFragment, detailFragment)
                 .commit();

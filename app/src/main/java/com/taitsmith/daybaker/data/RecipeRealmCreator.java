@@ -1,7 +1,6 @@
 package com.taitsmith.daybaker.data;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.taitsmith.daybaker.R;
@@ -21,6 +20,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import static com.taitsmith.daybaker.activities.BaseActivity.realmConfiguration;
+import static com.taitsmith.daybaker.activities.MainActivity.showError;
 
 /**
  * Downloads recipe JSON from web, parses it and creates realm objects to be used offline.
@@ -32,9 +32,8 @@ public class RecipeRealmCreator {
     private OkHttpClient client;
     private HttpUrl recipeUrl;
     private Realm realm;
-    public static boolean networkError;
 
-    public void downloadRecipeData(Context context) {
+    public void downloadRecipeData(final Context context) {
         recipeUrl = HttpUrl.parse(context.getString(R.string.recipe_url));
 
         client = new OkHttpClient();
@@ -49,14 +48,15 @@ public class RecipeRealmCreator {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Log.d("OKHTTP ERROR", e.toString());
-                networkError = true;
+                e.printStackTrace();
+                showError = true;
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                realm = Realm.getInstance(realmConfiguration);
+                showError = false;
 
+                realm = Realm.getInstance(realmConfiguration);
                 realm.beginTransaction();
 
                 try {
@@ -68,25 +68,22 @@ public class RecipeRealmCreator {
 
                         JSONObject object = recipeList.getJSONObject(i);
 
-                        String name = object.getString("name");
+                        String name = object.getString(context.getString(R.string.name));
                         recipe.setName(name);
 
-                        String ingredients = gson.toJson(object.getJSONArray("ingredients"));
+                        String ingredients = gson.toJson(object.getJSONArray(context.getString(
+                                R.string.ingredients)));
                         recipe.setIngredients(ingredients);
 
-                        String steps = gson.toJson(object.getJSONArray("steps"));
+                        String steps = gson.toJson(object.getJSONArray(context.getString(
+                                R.string.steps)));
                         recipe.setSteps(steps);
 
-                        int servings = object.getInt("servings");
+                        int servings = object.getInt(context.getString(R.string.servings));
                         recipe.setServings(servings);
-
-                        Log.d("RESULTS NAME ", name);
-                        Log.d("RESULTS STEPS ", steps);
                     }
                     realm.commitTransaction();
                     realm.close();
-                    networkError = false;
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
