@@ -9,19 +9,18 @@ import android.widget.TextView;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.taitsmith.daybaker.R;
 
 
 /**
  * Step list beep boop
  */
 
-public class MasterListAdapter extends BaseAdapter {
+public class StepListAdapter extends BaseAdapter {
     private Context context;
     private JsonArray stepArray;
 
 
-    public MasterListAdapter(Context context, JsonArray steps){
+    public StepListAdapter(Context context, JsonArray steps){
         this.context = context;
         stepArray = steps;
     }

@@ -11,14 +11,19 @@
     <string name="ingredient_summary_description">Here\'s your list of ingredients! Be sure to
         collect everything, then click the button to see the steps.</string>
     <string name="step_summary_description">Here\'s a brief summary of the necessary steps to make
-        %1$s. Select a step to see it in more detail. Some steps will include a video. Select the back
-        button to return to this menu or swipe left or right to cycle through steps.</string>
+        %1$s. Select a step to see it in more detail. Some steps will include a video, others will
+        include a very sad looking Android instead. Add a widget to your home screen to
+        keep you updated on your current step and return to this page.</string>
 
     <!-- nah this should go away -->
     <string name="step_detail_fragment_default">Select a step to view more information.</string>
 
+    <!-- widget stuff -->
+    <string name="widget_toast_hello">Happy baking!</string>
 
     <!-- just in case.-->
     <string name="no_network_error">Uh oh! Something seems to have gone wrong. Check your network
         connection and try again.</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 </resources>

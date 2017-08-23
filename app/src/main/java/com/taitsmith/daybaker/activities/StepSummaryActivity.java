@@ -1,5 +1,7 @@
 package com.taitsmith.daybaker.activities;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -12,6 +14,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.taitsmith.daybaker.R;
 import com.taitsmith.daybaker.data.Recipe;
+import com.taitsmith.daybaker.data.StepWidget;
 import com.taitsmith.daybaker.fragments.StepDetailFragment;
 import com.taitsmith.daybaker.fragments.StepListFragment;
 
@@ -44,13 +47,14 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
         setContentView(R.layout.activity_step_summary);
         ButterKnife.bind(this);
 
+        stepDetailFragment = new StepDetailFragment();
         realm = Realm.getInstance(realmConfiguration);
         manager = getSupportFragmentManager();
         JsonParser parser = new JsonParser();
         stepListFragment = new StepListFragment();
 
-        if (getIntent().hasExtra("recipe_name")){
-            recipeName = getIntent().getStringExtra("recipe_name");
+        if (getIntent().hasExtra("RECIPE_NAME")){
+            recipeName = getIntent().getStringExtra("RECIPE_NAME");
         }
 
         isTwoPane = findViewById(R.id.stepDetailFragment) != null;
@@ -60,34 +64,37 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
         results = realm.where(Recipe.class)
             .equalTo("name", recipeName)
             .findAll();
-
         recipe = results.first();
 
         String steps = recipe.getSteps();
-
         stepObject = parser.parse(steps).getAsJsonObject();
-
         stepArray = stepObject.get("values").getAsJsonArray();
+
 
         manager.beginTransaction()
                .add(R.id.stepListFragment, stepListFragment)
                .commit();
 
-        stepDetailFragment = new StepDetailFragment();
-
         if (isTwoPane) {
-           if (savedInstanceState != null) {
-               stepDetailFragment.setDescription(savedInstanceState.getString("DESCRIPTION"));
-               stepDetailFragment.setVideoUri(savedInstanceState.getString("VIDEO_URL"));
-               stepObject = parser.parse(savedInstanceState.getString("STEP_OBJECT")).getAsJsonObject();
-           } else {
-               stepDetailFragment.setVideoUri("");
-               stepDetailFragment.setDescription(getString(R.string.step_detail_fragment_default));
-           }
-               manager.beginTransaction()
-                       .add(R.id.stepDetailFragment, stepDetailFragment)
-                       .commit();
+            if (getIntent().hasExtra("DESCRIPTION") && getIntent().hasExtra("VIDEO_URL")) {
+                stepDetailFragment.setDescription(getIntent().getStringExtra("DESCRIPTION"));
+                stepDetailFragment.setVideoUri(getIntent().getStringExtra("VIDEO_URL"));
+            } else if (savedInstanceState != null) {
+                stepDetailFragment.setDescription(savedInstanceState.getString("DESCRIPTION"));
+                stepDetailFragment.setVideoUri(savedInstanceState.getString("VIDEO_URL"));
+                stepObject = parser.parse(savedInstanceState.getString("STEP_OBJECT")).getAsJsonObject();
+            } else {
+                stepObject = stepArray.get(0).getAsJsonObject();
+                JsonElement element = stepObject.get("nameValuePairs");
+                stepObject = element.getAsJsonObject();
+                stepDetailFragment.setVideoUri(stepObject.get("videoURL").getAsString());
+                stepDetailFragment.setDescription(stepObject.get("description").getAsString());
+            }
+            manager.beginTransaction()
+                    .replace(R.id.stepDetailFragment, stepDetailFragment)
+                    .commit();
         }
+
     }
 
     @Override
@@ -96,12 +103,22 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
         JsonElement element = stepObject.get("nameValuePairs");
         stepObject = element.getAsJsonObject();
 
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
+        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, StepWidget.class));
+
+        String description = stepObject.get("description").getAsString();
+        String videoUrl = stepObject.get("videoURL").getAsString();
+
+        StepWidget.stepDescription = description;
+        StepWidget.videoUrl = videoUrl;
+        StepWidget.step = recipeName;
+
+        StepWidget.updateWidgetText(this, appWidgetManager, appWidgetIds, description);
+
         if (isTwoPane){
             stepDetailFragment = new StepDetailFragment();
-            FragmentManager manager = getSupportFragmentManager();
-
-            stepDetailFragment.setDescription(stepObject.get("description").getAsString());
-            stepDetailFragment.setVideoUri(stepObject.get("videoURL").getAsString());
+            stepDetailFragment.setDescription(description);
+            stepDetailFragment.setVideoUri(videoUrl);
 
             manager.beginTransaction()
                     .replace(R.id.stepDetailFragment, stepDetailFragment)

@@ -12,7 +12,7 @@ import android.widget.GridView;
 
 import com.taitsmith.daybaker.R;
 import com.taitsmith.daybaker.activities.StepSummaryActivity;
-import com.taitsmith.daybaker.data.MasterListAdapter;
+import com.taitsmith.daybaker.data.StepListAdapter;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -59,7 +59,7 @@ public class StepListFragment extends Fragment {
         ButterKnife.bind(this, rootView);
         final GridView gridView = rootView.findViewById(R.id.master_recycler_view);
 
-        final MasterListAdapter adapter = new MasterListAdapter(getContext(), StepSummaryActivity.stepArray);
+        final StepListAdapter adapter = new StepListAdapter(getContext(), StepSummaryActivity.stepArray);
 
         gridView.setAdapter(adapter);
 

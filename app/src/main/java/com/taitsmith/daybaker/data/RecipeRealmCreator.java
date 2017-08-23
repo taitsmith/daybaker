@@ -32,7 +32,7 @@ public class RecipeRealmCreator {
     private OkHttpClient client;
     private HttpUrl recipeUrl;
     private Realm realm;
-
+    public static boolean networkError;
 
     public void downloadRecipeData(Context context) {
         recipeUrl = HttpUrl.parse(context.getString(R.string.recipe_url));
@@ -49,7 +49,8 @@ public class RecipeRealmCreator {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Log.d("OKHTTP ", "FAILURE");
+                Log.d("OKHTTP ERROR", e.toString());
+                networkError = true;
             }
 
             @Override
@@ -84,6 +85,7 @@ public class RecipeRealmCreator {
                     }
                     realm.commitTransaction();
                     realm.close();
+                    networkError = false;
 
                 } catch (JSONException e) {
                     e.printStackTrace();

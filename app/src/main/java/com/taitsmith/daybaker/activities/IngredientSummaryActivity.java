@@ -69,7 +69,7 @@ public class IngredientSummaryActivity extends AppCompatActivity {
     @OnClick(R.id.continueButton)
     public void seeSteps(){
         Intent intent = new Intent(this, StepSummaryActivity.class);
-        intent.putExtra("recipe_name", recipeName);
+        intent.putExtra("RECIPE_NAME", recipeName);
         startActivity(intent);
     }
 }

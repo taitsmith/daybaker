@@ -21,7 +21,17 @@
         </activity>
         <activity android:name=".activities.IngredientSummaryActivity" />
         <activity android:name=".activities.StepSummaryActivity" />
-        <activity android:name=".activities.StepDetailActivity"/>
+        <activity android:name=".activities.StepDetailActivity" />
+
+        <receiver android:name=".data.StepWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/step_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

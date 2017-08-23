@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.taitsmith.daybaker.activities.StepDetailActivity">
+    tools:context="com.taitsmith.daybaker.activities.StepDetailActivity"
+    android:background="@color/colorAccent">
 
     <FrameLayout
         android:id="@+id/stepDetailFragment"
@@ -17,6 +18,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="8dp"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        android:background="@color/colorPrimary"/>
 
 </android.support.constraint.ConstraintLayout>
