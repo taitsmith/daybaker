@@ -2,6 +2,7 @@ package com.taitsmith.daybaker.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.VisibleForTesting;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,9 +28,10 @@ public class IngredientSummaryActivity extends AppCompatActivity {
     RecyclerView ingredientRecycler;
     @BindView(R.id.continueButton)
     Button continueButton;
+    @VisibleForTesting
+    String recipeName = "Cheesecake";
 
     Realm realm;
-    String recipeName;
     Recipe recipe;
     IngredientAdapter adapter;
 

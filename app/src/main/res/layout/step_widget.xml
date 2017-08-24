@@ -11,6 +11,7 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:layout_margin="8dp"
+        android:text="@string/appwidget_text"
         android:contentDescription="@string/appwidget_text"
         android:textColor="@color/colorAccent"
         android:textSize="18sp"/>

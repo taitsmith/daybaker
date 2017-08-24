@@ -7,6 +7,9 @@
     <!-- for the main recipe text view -->
     <string name="serves">Serves: %1$d</string>
 
+    <!-- the button -->
+    <string name="got_it_button">Got it!</string>
+
     <!-- pretty self explanatory -->
     <string name="ingredient_summary_description">Here\'s your list of ingredients! Be sure to
         collect everything, then click the button to see the steps.</string>
@@ -17,7 +20,7 @@
 
     <!-- widget stuff -->
     <string name="widget_toast_hello">Happy baking!</string>
-    <string name="appwidget_text">View a recipe\'s to see them here.</string>
+    <string name="appwidget_text">View a recipe\'s steps to see them here.</string>
     <string name="add_widget">Add widget</string>
 
     <!-- just in case.-->

@@ -4,6 +4,7 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
@@ -26,7 +27,6 @@ import io.realm.RealmResults;
 import static com.taitsmith.daybaker.activities.BaseActivity.realmConfiguration;
 
 public class StepSummaryActivity extends AppCompatActivity implements StepListFragment.OnStepClickListener {
-    private String recipeName;
     private Realm realm;
     private Recipe recipe;
     private RealmResults<Recipe> results;
@@ -40,6 +40,8 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
     @BindView(R.id.stepSummaryDescription)
     TextView summaryDescription;
 
+    @VisibleForTesting
+    String recipeName = "Cheesecake";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +62,8 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
         isTwoPane = findViewById(R.id.stepDetailFragment) != null;
 
         summaryDescription.setText(getString(R.string.step_summary_description, recipeName));
+
+
 
         results = realm.where(Recipe.class)
             .equalTo("name", recipeName)
