@@ -31,4 +31,10 @@ public class BaseActivity extends Application {
             creator.downloadRecipeData(this);
         }
     }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        recipeRealm.close();
+    }
 }

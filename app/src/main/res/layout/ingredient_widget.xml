@@ -1,19 +1,21 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/widget_margin"
-    android:background="@color/colorPrimary">
+    android:background="#09C"
+    android:padding="@dimen/widget_margin">
 
     <TextView
-        android:id="@+id/step_text"
+        android:id="@+id/appwidget_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:layout_margin="8dp"
-        android:text="@string/step_widget_default_text"
+        android:background="#09C"
         android:contentDescription="@string/step_widget_default_text"
-        android:textColor="@color/colorAccent"
-        android:textSize="18sp"/>
+        android:text="@string/step_widget_default_text"
+        android:textColor="#ffffff"
+        android:textSize="24sp"
+        android:textStyle="bold|italic" />
 
 </RelativeLayout>

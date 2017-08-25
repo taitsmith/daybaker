@@ -3,6 +3,7 @@ package com.taitsmith.daybaker.activities;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentManager;
@@ -29,13 +30,18 @@ import static com.taitsmith.daybaker.activities.BaseActivity.realmConfiguration;
 public class StepSummaryActivity extends AppCompatActivity implements StepListFragment.OnStepClickListener {
     private Realm realm;
     private Recipe recipe;
-    private RealmResults<Recipe> results;
-    private FragmentManager manager;
+    private FragmentManager fragmentManager;
     private StepListFragment stepListFragment;
     private StepDetailFragment stepDetailFragment;
     private JsonObject stepObject;
-    public static JsonArray stepArray;
+    private SharedPreferences preferences;
     private boolean isTwoPane;
+    private JsonParser jsonParser;
+
+    public String videoUrl, stepDescription, stepString;
+
+    public static JsonArray stepArray;
+    public static final String SHARED_PREFS = "sharedPrefs";
 
     @BindView(R.id.stepSummaryDescription)
     TextView summaryDescription;
@@ -49,62 +55,86 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
         setContentView(R.layout.activity_step_summary);
         ButterKnife.bind(this);
 
+        stepListFragment = new StepListFragment();
         stepDetailFragment = new StepDetailFragment();
         realm = Realm.getInstance(realmConfiguration);
-        manager = getSupportFragmentManager();
-        JsonParser parser = new JsonParser();
-        stepListFragment = new StepListFragment();
+        fragmentManager = getSupportFragmentManager();
+        jsonParser = new JsonParser();
+        preferences = getSharedPreferences(SHARED_PREFS, 0);
 
-        if (getIntent().hasExtra("RECIPE_NAME")){
+        //assuming we got here somehow and that the name of the
+        //selected recipe was sent with us;
+        if (getIntent().hasExtra("RECIPE_NAME")) {
             recipeName = getIntent().getStringExtra("RECIPE_NAME");
+        } else {
+            recipeName = preferences.getString("RECIPE_NAME", null);
+        }
+
+        //set the basic description text to include the recipe name.
+        summaryDescription.setText(getString(R.string.step_summary_description, recipeName));
+
+        //do a real query and get the recipe object.
+        RealmResults<Recipe> results = realm.where(Recipe.class)
+                .equalTo("name", recipeName)
+                .findAll();
+        recipe = results.first();
+
+        setUi();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getStepData();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        saveStepData(videoUrl, stepDescription, stepObject.toString());
+    }
+
+    public void setUi() {
+        String steps = recipe.getSteps();
+        stepObject = jsonParser.parse(steps).getAsJsonObject();
+        stepArray = stepObject.get(getString(R.string.values)).getAsJsonArray();
+        stepObject = stepArray.get(0).getAsJsonObject();
+        JsonElement element = stepObject.get(getString(R.string.nameValuePairs));
+        stepObject = element.getAsJsonObject();
+
+        //if we already have some saved info we'll just use that.
+//        if (dataSaved) {
+        if (preferences.contains("DESCRIPTION")) {
+            getStepData();
+        } else { //otherwise just go to the first step in the list.
+            videoUrl = stepObject.get(getString(R.string.videoURL)).getAsString();
+            stepDescription = stepObject.get(getString(R.string.description)).getAsString();
         }
 
         isTwoPane = findViewById(R.id.stepDetailFragment) != null;
 
-        summaryDescription.setText(getString(R.string.step_summary_description, recipeName));
-
-
-
-        results = realm.where(Recipe.class)
-            .equalTo("name", recipeName)
-            .findAll();
-        recipe = results.first();
-
-        String steps = recipe.getSteps();
-        JsonObject object = parser.parse(steps).getAsJsonObject();
-        stepArray = object.get(getString(R.string.values)).getAsJsonArray();
-        manager.beginTransaction()
-                .replace(R.id.stepListFragment, stepListFragment)
-                .commit();
-
-        stepDetailFragment = new StepDetailFragment();
-
-        if(!isTwoPane && getIntent().hasExtra("DESCRIPTION")){
+        //if it's not two pane and it's coming from the widget
+        //start the StepDetailActivity with the relevant info
+        if(!isTwoPane && getIntent().getBooleanExtra("FROM_HOMESCREEN", false)){
             Intent intent = new Intent(this, StepDetailActivity.class);
-            intent.putExtra("DESCRIPTION", getIntent().getStringExtra("DESCRIPTION"));
-            intent.putExtra("VIDEO_URL", getIntent().getStringExtra("VIDEO_URL"));
+            intent.putExtra("DESCRIPTION", stepDescription);
+            intent.putExtra("VIDEO_URL", videoUrl);
             startActivity(intent);
         }
-
+        
+        //do some stuff if it's two-pane
         if (isTwoPane) {
-            if (savedInstanceState != null) {
-                stepDetailFragment.setDescription(savedInstanceState.getString("DESCRIPTION"));
-                stepDetailFragment.setVideoUri(savedInstanceState.getString("VIDEO_URL"));
-                stepObject = parser.parse(savedInstanceState.getString("STEP_OBJECT")).getAsJsonObject();
-            }else if (getIntent().hasExtra("DESCRIPTION")) {
-                stepDetailFragment.setDescription(getIntent().getStringExtra("DESCRIPTION"));
-                stepDetailFragment.setVideoUri(getIntent().getStringExtra("VIDEO_URL"));
-                stepObject = parser.parse(getIntent().getStringExtra("STEP_STRING")).getAsJsonObject();
-            } else {
-                stepObject = stepArray.get(0).getAsJsonObject();
-                JsonElement element = stepObject.get(getString(R.string.nameValuePairs));
-                stepObject = element.getAsJsonObject();
-                stepDetailFragment.setVideoUri(stepObject.get(getString(R.string.videoURL)).getAsString());
-                stepDetailFragment.setDescription(stepObject.get(getString(R.string.description)).getAsString());
-            }
-            manager.beginTransaction()
-                .replace(R.id.stepDetailFragment, stepDetailFragment)
-                .commit();
+            stepDetailFragment.setVideoUri(videoUrl);
+            stepDetailFragment.setDescription(stepDescription);
+            fragmentManager.beginTransaction()
+                    .replace(R.id.stepListFragment, stepListFragment)
+                    .replace(R.id.stepDetailFragment, stepDetailFragment)
+                    .commit();
+        } else {
+            //do some different stuff if it's single pane
+            fragmentManager.beginTransaction()
+                    .replace(R.id.stepListFragment, stepListFragment)
+                    .commit();
         }
     }
 
@@ -117,38 +147,47 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, StepWidget.class));
 
-        String description = stepObject.get(getString(R.string.description)).getAsString();
-        String videoUrl = stepObject.get(getString(R.string.videoURL)).getAsString();
+        stepDescription = stepObject.get(getString(R.string.description)).getAsString();
+        videoUrl = stepObject.get(getString(R.string.videoURL)).getAsString();
 
-        StepWidget.stepDescription = description;
-        StepWidget.videoUrl = videoUrl;
-        StepWidget.recipeName = recipeName;
-        StepWidget.stepObject = stepObject.toString();
+        //update the widget.
+        StepWidget.updateWidgetText(this, appWidgetManager, appWidgetIds, stepDescription);
 
-        StepWidget.updateWidgetText(this, appWidgetManager, appWidgetIds, description);
-
+        //if it's two pane change the detail fragment
         if (isTwoPane){
             stepDetailFragment = new StepDetailFragment();
-            stepDetailFragment.setDescription(description);
+            stepDetailFragment.setDescription(stepDescription);
             stepDetailFragment.setVideoUri(videoUrl);
 
-            manager.beginTransaction()
+            fragmentManager.beginTransaction()
                     .replace(R.id.stepDetailFragment, stepDetailFragment)
                     .commit();
-        } else {
+        } else { //otherwise start a new activity.
+            saveStepData(videoUrl, stepDescription, stepString);
             Intent intent = new Intent(this, StepDetailActivity.class);
             intent.putExtra("RECIPE_NAME", stepObject.toString());
             startActivity(intent);
         }
     }
 
+    public void saveStepData(String videoUrl, String description, String step) {
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("VIDEO_URL", videoUrl);
+        editor.putString("DESCRIPTION", description);
+        editor.putString("STEP_OBJECT", step);
+        editor.putString("RECIPE_NAME", recipe.getName());
+        editor.apply();
+    }
+    public void getStepData() {
+        stepString = preferences.getString("STEP_OBJECT", null);
+        videoUrl = preferences.getString("VIDEO_URL", null);
+        stepDescription = preferences.getString("DESCRIPTION", null);
+        recipeName = preferences.getString("RECIPE_NAME", null);
+    }
+
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        if (isTwoPane) {
-            outState.putString("STEP_OBJECT", stepObject.toString());
-            outState.putString("DESCRIPTION", stepObject.get(getString(R.string.description)).getAsString());
-            outState.putString("VIDEO_URL", stepObject.get(getString(R.string.videoURL)).getAsString());
-            super.onSaveInstanceState(outState);
-        }
+    protected void onDestroy() {
+        super.onDestroy();
+        realm.close();
     }
 }

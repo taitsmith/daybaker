@@ -1,5 +1,6 @@
 package com.taitsmith.daybaker.activities;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -7,8 +8,9 @@ import android.support.v7.app.AppCompatActivity;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.taitsmith.daybaker.R;
-import com.taitsmith.daybaker.data.StepWidget;
 import com.taitsmith.daybaker.fragments.StepDetailFragment;
+
+import static com.taitsmith.daybaker.activities.StepSummaryActivity.SHARED_PREFS;
 
 public class StepDetailActivity extends AppCompatActivity {
     private JsonObject step;
@@ -21,13 +23,11 @@ public class StepDetailActivity extends AppCompatActivity {
         parser = new JsonParser();
         StepDetailFragment detailFragment = new StepDetailFragment();
         FragmentManager manager = getSupportFragmentManager();
-
-
-
+        SharedPreferences preferences = getSharedPreferences(SHARED_PREFS, 0);
 
         if (getIntent().hasExtra("VIDEO_URL")){
-            detailFragment.setDescription(StepWidget.stepDescription);
-            detailFragment.setVideoUri(StepWidget.videoUrl);
+            detailFragment.setDescription(preferences.getString("DESCRIPTION", null));
+            detailFragment.setVideoUri(preferences.getString("VIDEO_URL", null));
         } else if (getIntent().hasExtra("RECIPE_NAME")){
             String stepString = getIntent().getStringExtra("RECIPE_NAME");
             step = parser.parse(stepString).getAsJsonObject();
