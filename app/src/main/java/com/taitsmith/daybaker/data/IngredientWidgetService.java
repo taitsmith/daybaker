@@ -45,45 +45,48 @@ public class IngredientWidgetService extends IntentService {
         }
     }
 
+    //display the next ingredient (or the first)
     public void handleActionNextIngredient() {
         preferences = this.getSharedPreferences(SHARED_PREFS, 0);
         SharedPreferences.Editor editor = preferences.edit();
-        try {
-            int nextIngredient = preferences.getInt("CURRENT_INGREDIENT", 0) + 1;
+        ingredients = preferences.getString("INGREDIENTS", null).split("-");
+        int nextIngredient;
 
-            ingredients = preferences.getString("INGREDIENTS", null).split("-");
-            String widgetText = ingredients[nextIngredient];
-            AppWidgetManager manager = AppWidgetManager.getInstance(this);
-            int[] appWidgetIds = manager.getAppWidgetIds(new ComponentName(this, IngredientWidget.class));
-
-            editor.putInt("CURRENT_INGREDIENT", nextIngredient);
-            editor.apply();
-
-            IngredientWidget.updateWidgetText(this, manager, appWidgetIds, widgetText);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            handleActionPreviousIngredient();
+        if (preferences.getInt("CURRENT_INGREDIENT", 0) +1 == ingredients.length) {
+            nextIngredient = 0;
+        } else {
+            nextIngredient = preferences.getInt("CURRENT_INGREDIENT", 0) + 1;
         }
+
+        String widgetText = ingredients[nextIngredient];
+        AppWidgetManager manager = AppWidgetManager.getInstance(this);
+        int[] appWidgetIds = manager.getAppWidgetIds(new ComponentName(this, IngredientWidget.class));
+
+        editor.putInt("CURRENT_INGREDIENT", nextIngredient);
+        editor.apply();
+
+        IngredientWidget.updateWidgetText(this, manager, appWidgetIds, widgetText);
     }
 
+    //display the previous ingredient (or the last)
     public void handleActionPreviousIngredient() {
         preferences = this.getSharedPreferences(SHARED_PREFS, 0);
         SharedPreferences.Editor editor = preferences.edit();
+        ingredients = preferences.getString("INGREDIENTS", null).split("-");
+        int nextIngredient;
 
-
-        try {
-            int nextIngredient = preferences.getInt("CURRENT_INGREDIENT", 0) - 1;
-
-            ingredients = preferences.getString("INGREDIENTS", null).split("-");
-            String widgetText = ingredients[nextIngredient];
-            AppWidgetManager manager = AppWidgetManager.getInstance(this);
-            int[] appWidgetIds = manager.getAppWidgetIds(new ComponentName(this, IngredientWidget.class));
-
-            editor.putInt("CURRENT_INGREDIENT", nextIngredient);
-            editor.apply();
-
-            IngredientWidget.updateWidgetText(this, manager, appWidgetIds, widgetText);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            handleActionNextIngredient();
+        if (preferences.getInt("CURRENT_INGREDIENT", 0) == 0) {
+            nextIngredient = ingredients.length - 1;
+        } else {
+            nextIngredient = preferences.getInt("CURRENT_INGREDIENT", 0) - 1;
         }
+        String widgetText = ingredients[nextIngredient];
+        AppWidgetManager manager = AppWidgetManager.getInstance(this);
+        int[] appWidgetIds = manager.getAppWidgetIds(new ComponentName(this, IngredientWidget.class));
+
+        editor.putInt("CURRENT_INGREDIENT", nextIngredient);
+        editor.apply();
+
+        IngredientWidget.updateWidgetText(this, manager, appWidgetIds, widgetText);
     }
 }

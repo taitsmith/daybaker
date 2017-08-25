@@ -48,4 +48,18 @@
         app:layout_constraintBottom_toBottomOf="parent"
         style="@style/FragmentLayouts"/>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/returnHomeFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_padding"
+        android:clickable="true"
+        app:backgroundTint="@color/colorAccentDark"
+        app:fabSize="normal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:srcCompat="@drawable/ic_arrow_upward_black_36dp"
+        android:layout_marginEnd="@dimen/margin_padding"
+        android:layout_marginRight="8dp"/>
+
 </android.support.constraint.ConstraintLayout>

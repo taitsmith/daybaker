@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.VisibleForTesting;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
@@ -22,6 +23,7 @@ import com.taitsmith.daybaker.fragments.StepListFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
@@ -45,6 +47,8 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
 
     @BindView(R.id.stepSummaryDescription)
     TextView summaryDescription;
+    @BindView(R.id.returnHomeFab)
+    FloatingActionButton returnHome;
 
     @VisibleForTesting
     String recipeName = "Cheesecake";
@@ -189,5 +193,11 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
     protected void onDestroy() {
         super.onDestroy();
         realm.close();
+    }
+
+    @OnClick(R.id.returnHomeFab)
+    public void returnHome(){
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 }

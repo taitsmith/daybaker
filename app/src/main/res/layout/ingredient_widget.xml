@@ -1,7 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#09C"
+    android:background="@color/colorAccent"
     android:orientation="horizontal"
     android:padding="@dimen/widget_margin">
 
@@ -18,13 +18,10 @@
         android:layout_width="0dp"
         android:layout_weight=".8"
         android:layout_height="wrap_content"
-        android:background="#09C"
-        android:contentDescription="@string/step_widget_default_text"
-        android:text="@string/step_widget_default_text"
+        android:contentDescription="@string/ingredient_widget_default_text"
+        android:text="@string/ingredient_widget_default_text"
         android:textAlignment="center"
-        android:textColor="#ffffff"
-        android:textSize="24sp"
-        android:textStyle="bold|italic" />
+        style="@style/WidgetTextView"/>
 
     <ImageView
         android:contentDescription="@string/ingredient_widget_next_content_description"

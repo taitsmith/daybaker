@@ -25,6 +25,9 @@
     <string name="ingredient_widget_default_text">Select a recipe to view its ingredients</string>
     <string name="ingredient_widget_next_content_description">View next ingredient</string>
     <string name="ingredient_widget_previous_content_description">View previous ingredient</string>
+    <string name="widget_toast_beginning_of_list">Beginning of list.</string>
+    <string name="ingredient_widget_title">Ingredient List</string>
+    <string name="step_widget_title">Step Description</string>
 
     <!-- just in case.-->
     <string name="no_network_error">Uh oh! Something seems to have gone wrong. Check your network

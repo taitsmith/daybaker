@@ -32,6 +32,11 @@ import io.realm.RealmResults;
 import static com.taitsmith.daybaker.activities.BaseActivity.realmConfiguration;
 import static com.taitsmith.daybaker.activities.StepSummaryActivity.SHARED_PREFS;
 
+/**
+ * Just displays a recycler view full of ingredients and their amounts. When the continue button is
+ * clicked the widget text is set and a list of strings is stored in shared prefs to be used with the
+ * widget. It's probably more complicated than it needs to be.
+ */
 public class IngredientSummaryActivity extends AppCompatActivity {
     @BindView(R.id.rv_ingredients)
     RecyclerView ingredientRecycler;
@@ -53,7 +58,7 @@ public class IngredientSummaryActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         preferences = getSharedPreferences(SHARED_PREFS, 0);
-        ingredientList = new ArrayList<String>();
+        ingredientList = new ArrayList<>();
         realm = Realm.getInstance(realmConfiguration);
 
         if (getIntent().hasExtra("recipe_name")) {
@@ -87,8 +92,7 @@ public class IngredientSummaryActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void getIngredientArray(JsonArray ingredientsArray){
-
+    public void getIngredientArray(JsonArray ingredientsArray) {
         ListIterator<String> iterator = ingredientList.listIterator();
 
         for (JsonElement jsonElement : ingredientsArray) {
@@ -100,16 +104,18 @@ public class IngredientSummaryActivity extends AppCompatActivity {
         updateSharedPrefs((ArrayList<String>) ingredientList);
     }
 
-    public void updateSharedPrefs(ArrayList<String> list){
+    public void updateSharedPrefs(ArrayList<String> list) {
         StringBuilder builder = new StringBuilder();
         for (String s : list){
             builder.append(s).append("-");
         }
+
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("INGREDIENTS", builder.toString());
-        editor.putInt("CURRENT_INGREDIENT", 0);
+        editor.putInt("CURRENT_INGREDIENT", -1);
         Log.d("LOG ", builder.toString());
-        editor.commit();
+        editor.apply();
+        
         IngredientWidgetService.startActionNextIngredient(this);
     }
 }
