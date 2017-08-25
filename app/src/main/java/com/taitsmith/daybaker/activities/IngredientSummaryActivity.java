@@ -1,19 +1,27 @@
 package com.taitsmith.daybaker.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.VisibleForTesting;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.widget.Button;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.taitsmith.daybaker.R;
 import com.taitsmith.daybaker.data.IngredientAdapter;
+import com.taitsmith.daybaker.data.IngredientWidgetService;
 import com.taitsmith.daybaker.data.Recipe;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -22,6 +30,7 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 
 import static com.taitsmith.daybaker.activities.BaseActivity.realmConfiguration;
+import static com.taitsmith.daybaker.activities.StepSummaryActivity.SHARED_PREFS;
 
 public class IngredientSummaryActivity extends AppCompatActivity {
     @BindView(R.id.rv_ingredients)
@@ -31,9 +40,11 @@ public class IngredientSummaryActivity extends AppCompatActivity {
     @VisibleForTesting
     String recipeName = "Cheesecake";
 
-    Realm realm;
-    Recipe recipe;
-    IngredientAdapter adapter;
+    private Realm realm;
+    private Recipe recipe;
+    private IngredientAdapter adapter;
+    private List<String> ingredientList;
+    private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +52,8 @@ public class IngredientSummaryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_recipe_summary);
         ButterKnife.bind(this);
 
+        preferences = getSharedPreferences(SHARED_PREFS, 0);
+        ingredientList = new ArrayList<String>();
         realm = Realm.getInstance(realmConfiguration);
 
         if (getIntent().hasExtra("recipe_name")) {
@@ -54,15 +67,14 @@ public class IngredientSummaryActivity extends AppCompatActivity {
         recipe = results.first();
 
         String ingredients = recipe.getIngredients();
-
         JsonParser parser = new JsonParser();
-
         JsonObject ingredientObject = parser.parse(ingredients).getAsJsonObject();
-
         JsonArray ingredientsArray = ingredientObject.get("values").getAsJsonArray();
 
         LinearLayoutManager manager = new LinearLayoutManager(this);
         ingredientRecycler.setLayoutManager(manager);
+
+        getIngredientArray(ingredientsArray);
 
         adapter = new IngredientAdapter(ingredientsArray.size(), ingredientsArray);
         ingredientRecycler.setAdapter(adapter);
@@ -73,6 +85,32 @@ public class IngredientSummaryActivity extends AppCompatActivity {
         Intent intent = new Intent(this, StepSummaryActivity.class);
         intent.putExtra("RECIPE_NAME", recipeName);
         startActivity(intent);
+    }
+
+    public void getIngredientArray(JsonArray ingredientsArray){
+
+        ListIterator<String> iterator = ingredientList.listIterator();
+
+        for (JsonElement jsonElement : ingredientsArray) {
+            JsonObject object = jsonElement.getAsJsonObject();
+            object = object.get("nameValuePairs").getAsJsonObject();
+            String s = object.get("ingredient").getAsString();
+            iterator.add(s);
+        }
+        updateSharedPrefs((ArrayList<String>) ingredientList);
+    }
+
+    public void updateSharedPrefs(ArrayList<String> list){
+        StringBuilder builder = new StringBuilder();
+        for (String s : list){
+            builder.append(s).append("-");
+        }
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("INGREDIENTS", builder.toString());
+        editor.putInt("CURRENT_INGREDIENT", 0);
+        Log.d("LOG ", builder.toString());
+        editor.commit();
+        IngredientWidgetService.startActionNextIngredient(this);
     }
 }
 

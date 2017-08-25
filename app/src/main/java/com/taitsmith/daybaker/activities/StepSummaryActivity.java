@@ -102,13 +102,12 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
         JsonElement element = stepObject.get(getString(R.string.nameValuePairs));
         stepObject = element.getAsJsonObject();
 
-        //if we already have some saved info we'll just use that.
-//        if (dataSaved) {
-        if (preferences.contains("DESCRIPTION")) {
-            getStepData();
-        } else { //otherwise just go to the first step in the list.
+        //if the user has selected a new recipe show the first step
+        if (preferences.getBoolean("NEW_RECIPE", false)){
             videoUrl = stepObject.get(getString(R.string.videoURL)).getAsString();
             stepDescription = stepObject.get(getString(R.string.description)).getAsString();
+        } else {
+            getStepData();
         }
 
         isTwoPane = findViewById(R.id.stepDetailFragment) != null;
@@ -176,6 +175,7 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
         editor.putString("DESCRIPTION", description);
         editor.putString("STEP_OBJECT", step);
         editor.putString("RECIPE_NAME", recipe.getName());
+        editor.putBoolean("NEW_RECIPE", false);
         editor.apply();
     }
     public void getStepData() {

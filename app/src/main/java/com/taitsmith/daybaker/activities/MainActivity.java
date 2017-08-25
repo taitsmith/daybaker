@@ -62,20 +62,28 @@ public class MainActivity extends AppCompatActivity
         fillRecycler();
     }
 
+    //if there's an error
     public void hideUi(boolean hide) {
         if (hide) {
             errorTv.setVisibility(View.INVISIBLE);
             reloadFab.setVisibility(View.INVISIBLE);
         } else {
-            errorTv.setVisibility(View.VISIBLE);
-            reloadFab.setVisibility(View.VISIBLE);
+            errorTv.setVisibility(View.INVISIBLE);
+            reloadFab.setVisibility(View.INVISIBLE);
             recipeRecycler.setVisibility(View.VISIBLE);
         }
     }
 
+    //ui stuff
     public void fillRecycler() {
-        recipes = recipeRealm.where(Recipe.class)
-                .findAll();
+        try {
+            recipes = recipeRealm.where(Recipe.class)
+                    .findAll();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            hideUi(true);
+        }
+        hideUi(false);
 
         recipeAdapter = new RecipeAdapter(recipes.size(), recipes, this);
         recipeRecycler.setAdapter(recipeAdapter);
@@ -97,11 +105,13 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
     }
 
+    //button
     @OnClick(R.id.reloadFromNetworkFab)
     public void reloadFromNetwork() {
-        RecipeRealmCreator creator = new RecipeRealmCreator();
-        creator.downloadRecipeData(this);
-
+        if (recipeRealm.isEmpty()) {
+            RecipeRealmCreator creator = new RecipeRealmCreator();
+            creator.downloadRecipeData(this);
+        }
         if (!showError) {
             hideUi(false);
         }
