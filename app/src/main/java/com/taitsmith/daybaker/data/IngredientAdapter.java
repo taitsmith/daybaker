@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.taitsmith.daybaker.R;
 
@@ -62,15 +61,10 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
         }
 
         void bind(int position){
-            JsonElement element = ingredientList.get(position);
-            JsonObject object = element.getAsJsonObject();
-            JsonElement element1 = object.get("nameValuePairs");
-            JsonObject array = element1.getAsJsonObject();
-            String ingredient = array.get("ingredient").getAsString();
-            String measure = array.get("measure").getAsString();
-            String amount = array.get("quantity").getAsString();
+            JsonObject ingredient = (ingredientList.get(position)).getAsJsonObject();
+            String measure = ingredient.get("measure").toString();
+            String amount = ingredient.get("quantity").toString();
             String measuredAmount;
-
 
             //because 5 UNIT looks weird.
             if (measure.equals("UNIT")) {
@@ -78,8 +72,9 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
             } else {
                 measuredAmount = amount.concat(measure);
             }
-            ingredientName.setText(ingredient);
             ingredientMeasure.setText(measuredAmount);
+            ingredientName.setText(ingredient.get("ingredient").toString());
+
         }
     }
 }

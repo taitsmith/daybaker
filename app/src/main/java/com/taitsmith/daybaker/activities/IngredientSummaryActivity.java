@@ -50,6 +50,8 @@ public class IngredientSummaryActivity extends AppCompatActivity {
     private IngredientAdapter adapter;
     private List<String> ingredientList;
     private SharedPreferences preferences;
+    private JsonParser parser;
+    private JsonArray ingredientsArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +62,8 @@ public class IngredientSummaryActivity extends AppCompatActivity {
         preferences = getSharedPreferences(SHARED_PREFS, 0);
         ingredientList = new ArrayList<>();
         realm = Realm.getInstance(realmConfiguration);
+        parser = new JsonParser();
+
 
         if (getIntent().hasExtra("recipe_name")) {
             recipeName = getIntent().getStringExtra("recipe_name");
@@ -71,18 +75,15 @@ public class IngredientSummaryActivity extends AppCompatActivity {
 
         recipe = results.first();
 
-        String ingredients = recipe.getIngredients();
-        JsonParser parser = new JsonParser();
-        JsonObject ingredientObject = parser.parse(ingredients).getAsJsonObject();
-        JsonArray ingredientsArray = ingredientObject.get("values").getAsJsonArray();
+        ingredientsArray = parser.parse(recipe.getIngredients()).getAsJsonArray();
 
         LinearLayoutManager manager = new LinearLayoutManager(this);
         ingredientRecycler.setLayoutManager(manager);
 
-        getIngredientArray(ingredientsArray);
-
         adapter = new IngredientAdapter(ingredientsArray.size(), ingredientsArray);
         ingredientRecycler.setAdapter(adapter);
+
+
     }
 
     @OnClick(R.id.continueButton)

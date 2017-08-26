@@ -9,10 +9,10 @@ import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.taitsmith.daybaker.R;
@@ -99,18 +99,16 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
     }
 
     public void setUi() {
-        String steps = recipe.getSteps();
-        stepObject = jsonParser.parse(steps).getAsJsonObject();
-        stepArray = stepObject.get(getString(R.string.values)).getAsJsonArray();
-        stepObject = stepArray.get(0).getAsJsonObject();
-        JsonElement element = stepObject.get(getString(R.string.nameValuePairs));
-        stepObject = element.getAsJsonObject();
+        stepArray = jsonParser.parse(recipe.getSteps()).getAsJsonArray();
+        Log.d("LOG ", stepArray.toString());
 
         //if the user has selected a new recipe show the first step
         if (preferences.getBoolean("NEW_RECIPE", false)){
+            stepObject = stepArray.get(0).getAsJsonObject();
             videoUrl = stepObject.get(getString(R.string.videoURL)).getAsString();
             stepDescription = stepObject.get(getString(R.string.description)).getAsString();
         } else {
+            stepObject = stepArray.get(0).getAsJsonObject();
             getStepData();
         }
 
@@ -144,8 +142,6 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
     @Override
     public void onStepSelected(int position) {
         stepObject = stepArray.get(position).getAsJsonObject();
-        JsonElement element = stepObject.get(getString(R.string.nameValuePairs));
-        stepObject = element.getAsJsonObject();
 
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, StepWidget.class));
@@ -183,7 +179,8 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
         editor.apply();
     }
     public void getStepData() {
-        stepString = preferences.getString("STEP_OBJECT", null);
+        stepObject = jsonParser.parse(preferences.getString("STEP_OBJECT", null))
+                    .getAsJsonObject();
         videoUrl = preferences.getString("VIDEO_URL", null);
         stepDescription = preferences.getString("DESCRIPTION", null);
         recipeName = preferences.getString("RECIPE_NAME", null);

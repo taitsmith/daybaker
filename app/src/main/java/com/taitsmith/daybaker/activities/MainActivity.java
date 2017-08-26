@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity
     RealmResults<Recipe> recipes;
     private Recipe recipe;
     public static boolean showError;
-    private int numColumns;
 
     @BindView(R.id.rv_recipes)
     RecyclerView recipeRecycler;

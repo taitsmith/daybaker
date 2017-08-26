@@ -43,10 +43,9 @@ public class StepListAdapter extends BaseAdapter {
         }
 
         JsonObject object = stepArray.get(i).getAsJsonObject();
-        object = object.get("nameValuePairs").getAsJsonObject();
-        String step = object.get("shortDescription").getAsString();
 
-        textView.setText(step);
+
+        textView.setText(object.get("shortDescription").toString());
 
         return textView;
     }
