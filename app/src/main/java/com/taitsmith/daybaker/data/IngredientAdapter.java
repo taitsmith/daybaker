@@ -49,7 +49,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
         return numberItems;
     }
 
-    public class IngredientViewHolder extends RecyclerView.ViewHolder {
+    class IngredientViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.list_ingredient_name_tv)
         TextView ingredientName;
         @BindView(R.id.list_ingredient_measurement_tv)
@@ -74,7 +74,6 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
             }
             ingredientMeasure.setText(measuredAmount);
             ingredientName.setText(HelpfulUtils.removeQuotes(ingredient.get("ingredient").toString()));
-
         }
     }
 }

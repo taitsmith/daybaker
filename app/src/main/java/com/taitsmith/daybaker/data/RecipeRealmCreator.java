@@ -1,7 +1,6 @@
 package com.taitsmith.daybaker.data;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -62,6 +61,8 @@ public class RecipeRealmCreator {
                 responseData = response.body().string();
                 recipeResponseList = parser.parse(responseData).getAsJsonArray();
 
+                //The json that comes back is pretty messy so you have
+                //to get rid of a lot of stuff.
                 for (JsonElement element : recipeResponseList) {
                     Recipe recipe = realm.createObject(Recipe.class);
                     recipe.setIngredients(element.getAsJsonObject().get("ingredients").toString());
@@ -71,7 +72,6 @@ public class RecipeRealmCreator {
                     recipe.setServings(element.getAsJsonObject().get("servings").getAsInt());
                     recipe.setPosition(i);
                     i++;
-                    Log.d("NAME ", recipe.getName());
                 }
                 realm.commitTransaction();
                 realm.close();

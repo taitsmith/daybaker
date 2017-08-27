@@ -11,8 +11,8 @@ import android.support.annotation.Nullable;
 import static com.taitsmith.daybaker.activities.StepSummaryActivity.SHARED_PREFS;
 
 /**
- * Updates text on the ingredient list widget
- * As of 27 Aug not being used, will be re-implemented in future.
+ * From old recipe widget to cycle through ingredients. Will be re-implemented
+ * later so I'm keeping it.
  */
 
 public class IngredientWidgetService extends IntentService {

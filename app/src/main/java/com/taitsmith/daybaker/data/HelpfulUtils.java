@@ -14,11 +14,12 @@ import static com.taitsmith.daybaker.activities.BaseActivity.realmConfiguration;
 
 /**
  * Get rid of those pesky " " around all of the strings from the JSON and
- * also swippy swap between recipes in the ingredient master list.
+ * also swippy swap between recipes in the ingredient master list. Also gets
+ * a list of ingrediends for the widget.
  */
 
 public class HelpfulUtils {
-
+    //for swapping between recipes in the stepsummaryactivity
     public static Recipe getNextRecipe(String currentRecipe) {
         Realm realm = Realm.getInstance(realmConfiguration);
         Recipe nextRecipe;
@@ -39,6 +40,7 @@ public class HelpfulUtils {
         return nextRecipe;
     }
 
+    //for swapping between recipes in the stepsummaryactivity
     public static Recipe getPreviousRecipe(String currentRecipe) {
         Realm realm = Realm.getInstance(realmConfiguration);
         Recipe previousRecipe;
@@ -56,10 +58,10 @@ public class HelpfulUtils {
         } else {
             previousRecipe = realmResults.get(position - 1);
         }
-
         return previousRecipe;
     }
 
+    //all of the json strings have "" around them.
     static String removeQuotes(String input) {
         return input.replace("\"", "");
     }
@@ -90,7 +92,6 @@ public class HelpfulUtils {
             }
             ingredientList.add(ingredient.concat("\n"));
         }
-
         return ingredientList;
     }
 }

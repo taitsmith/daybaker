@@ -63,16 +63,12 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         void bind(int position) {
             Recipe recipe = recipes.get(position);
 
-            String name = recipe.getName();
-
             int servings = recipe.getServings();
             String servingString = itemView.getResources().getString(R.string.serves, servings);
 
-            nameTv.setText(name);
+            nameTv.setText(recipe.getName());
             servingsTv.setText(servingString);
         }
-
-
     }
 
     @Override

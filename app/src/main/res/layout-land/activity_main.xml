@@ -36,6 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/margin_padding"
         android:layout_marginRight="@dimen/margin_padding"
+        android:layout_marginEnd="@dimen/margin_padding"
         android:clickable="true"
         app:backgroundTint="@color/colorPrimary"
         app:fabSize="mini"

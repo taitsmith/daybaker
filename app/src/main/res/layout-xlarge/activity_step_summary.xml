@@ -60,6 +60,6 @@
         app:layout_constraintRight_toRightOf="parent"
         app:srcCompat="@drawable/ic_more_horiz_black_36dp"
         android:layout_marginEnd="@dimen/margin_padding"
-        android:layout_marginRight="8dp"/>
+        android:layout_marginRight="@dimen/margin_padding"/>
 
 </android.support.constraint.ConstraintLayout>

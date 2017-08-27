@@ -54,6 +54,7 @@ public class StepDetailFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
     }
 
     @Nullable
@@ -101,18 +102,11 @@ public class StepDetailFragment extends Fragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        player.stop();
-        player.release();
-        player = null;
-    }
-
-    @Override
     public void onPause() {
         super.onPause();
         player.stop();
         player.release();
+        player = null;
     }
 
     @Override

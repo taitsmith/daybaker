@@ -11,7 +11,7 @@ import com.taitsmith.daybaker.R;
 import java.util.List;
 
 /**
- * Widget to display and shuffle through recipe ingredients.
+ * Widget to display list of ingrediens for a selected recipe
  */
 public class IngredientWidget extends AppWidgetProvider {
 

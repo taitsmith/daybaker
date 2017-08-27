@@ -12,7 +12,7 @@ import com.google.gson.JsonObject;
 
 
 /**
- * Step list beep boop
+ * Step list for the steplist fragment.
  */
 
 public class StepListAdapter extends BaseAdapter {
@@ -43,7 +43,6 @@ public class StepListAdapter extends BaseAdapter {
         }
 
         JsonObject object = stepArray.get(i).getAsJsonObject();
-
 
         textView.setText(HelpfulUtils.removeQuotes(object.get("shortDescription").toString()));
 

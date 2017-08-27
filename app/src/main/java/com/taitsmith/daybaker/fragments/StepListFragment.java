@@ -24,7 +24,6 @@ import static com.taitsmith.daybaker.activities.StepSummaryActivity.stepArray;
 
 public class StepListFragment extends Fragment {
     OnStepClickListener listener;
-    private String recipeName;
 
     @BindView(R.id.master_recycler_view)
     GridView stepRecycler;
@@ -63,7 +62,6 @@ public class StepListFragment extends Fragment {
 
         final StepListAdapter adapter = new StepListAdapter(getContext(), stepArray);
 
-
         gridView.setAdapter(adapter);
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -76,36 +74,4 @@ public class StepListFragment extends Fragment {
 
         return rootView;
     }
-
-    public void setRecipeName(String name){
-        recipeName = name;
-    }
-
-//    @OnClick(R.id.master_list_next_recipe)
-//    public void nextRecipe() {
-//        SharedPreferences preferences = getContext().getSharedPreferences(SHARED_PREFS, 0);
-//        SharedPreferences.Editor edit = preferences.edit();
-//        edit.putBoolean("NEW_RECIPE", true);
-//        edit.apply();
-//
-//        Intent intent = new Intent(getActivity(), StepSummaryActivity.class);
-//        intent.putExtra("RECIPE_NAME", HelpfulUtils.getNextRecipe(recipeName));
-//        getActivity().finish();
-//        startActivity(intent);
-//
-//    }
-//
-//    @OnClick(R.id.master_list_previous_recipe)
-//    public void previousRecipe() {
-//        getActivity().finish();
-//
-//        SharedPreferences preferences = getContext().getSharedPreferences(SHARED_PREFS, 0);
-//        SharedPreferences.Editor edit = preferences.edit();
-//        edit.putBoolean("NEW_RECIPE", true);
-//        edit.apply();
-//
-//        Intent intent = new Intent(getActivity(), StepSummaryActivity.class);
-//        intent.putExtra("RECIPE_NAME", HelpfulUtils.getPreviousRecipe(recipeName));
-//        startActivity(intent);
-//    }
 }

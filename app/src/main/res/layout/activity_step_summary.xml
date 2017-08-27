@@ -24,7 +24,7 @@
         style="@style/FragmentLayouts"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="@dimen/margin_padding"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -40,8 +40,9 @@
         app:fabSize="mini"
         app:srcCompat="@drawable/ic_more_horiz_black_36dp"
         app:layout_constraintRight_toRightOf="@+id/stepListFragment"
-        android:layout_marginRight="8dp"
+        android:layout_marginRight="@dimen/margin_padding"
+        android:layout_marginEnd="@dimen/margin_padding"
         app:layout_constraintBottom_toBottomOf="@+id/stepListFragment"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="@dimen/margin_padding" />
 
 </android.support.constraint.ConstraintLayout>
