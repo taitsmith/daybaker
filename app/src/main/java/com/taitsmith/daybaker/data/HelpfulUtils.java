@@ -1,11 +1,10 @@
 package com.taitsmith.daybaker.data;
 
-import android.util.Log;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
@@ -65,7 +64,10 @@ public class HelpfulUtils {
         return input.replace("\"", "");
     }
 
+    //takes the ingredient array and makes a List for use in the widget.
+    //pretty goofy so it'll be changed to a listview at some point
     public static List<String> getStringsForIngredientWidget(String recipeName) {
+        List<String> ingredientList = new ArrayList<>();
         Realm realm = Realm.getInstance(realmConfiguration);
         JsonParser jsonParser = new JsonParser();
         RealmResults<Recipe> realmResults = realm.where(Recipe.class)
@@ -73,12 +75,22 @@ public class HelpfulUtils {
                 .findAll();
 
         Recipe recipe = realmResults.first();
-        JsonArray stepArray = jsonParser.parse(recipe.getIngredients()).getAsJsonArray();
+        JsonArray ingredientArray = jsonParser.parse(recipe.getIngredients()).getAsJsonArray();
 
-        for (JsonElement element : stepArray) {
+        for (JsonElement element : ingredientArray) {
             String ingredient = removeQuotes(element.getAsJsonObject().get("ingredient").getAsString());
-            Log.d("INGREDIENT: ", ingredient);
+            String measure = element.getAsJsonObject().get("measure").getAsString().concat(")");
+            String amount = (" " +
+                    "(").concat(element.getAsJsonObject().get("quantity").getAsString());
+
+            if (measure.equals("UNIT)")) {
+                ingredient = ingredient.concat(amount).concat(")");
+            } else {
+                ingredient = ingredient.concat(amount).concat(measure);
+            }
+            ingredientList.add(ingredient.concat("\n"));
         }
-        return  null;
+
+        return ingredientList;
     }
 }

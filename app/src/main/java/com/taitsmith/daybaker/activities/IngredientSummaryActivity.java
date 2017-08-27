@@ -1,5 +1,7 @@
 package com.taitsmith.daybaker.activities;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -14,6 +16,7 @@ import com.google.gson.JsonParser;
 import com.taitsmith.daybaker.R;
 import com.taitsmith.daybaker.data.HelpfulUtils;
 import com.taitsmith.daybaker.data.IngredientAdapter;
+import com.taitsmith.daybaker.data.IngredientWidget;
 import com.taitsmith.daybaker.data.Recipe;
 
 import java.util.ArrayList;
@@ -79,7 +82,13 @@ public class IngredientSummaryActivity extends AppCompatActivity {
         adapter = new IngredientAdapter(ingredientsArray.size(), ingredientsArray);
         ingredientRecycler.setAdapter(adapter);
 
-        HelpfulUtils.getStringsForIngredientWidget(recipeName);
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
+        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, IngredientWidget.class));
+
+
+
+        IngredientWidget.updateWidgetText(this, appWidgetManager, appWidgetIds,
+                HelpfulUtils.getStringsForIngredientWidget(recipeName));
     }
 
     @OnClick(R.id.continueButton)

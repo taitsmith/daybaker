@@ -44,7 +44,7 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
     private FloatingActionMenu actionMenu;
     private SharedPreferences.Editor editor;
 
-    public String videoUrl, stepDescription, stepString;
+    public String videoUrl, stepDescription, stepString, imageUrl;
 
     public static JsonArray stepArray;
     public static final String SHARED_PREFS = "sharedPrefs";
@@ -97,7 +97,7 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
     @Override
     protected void onPause() {
         super.onPause();
-        saveStepData(videoUrl, stepDescription, stepObject.toString());
+        saveStepData(imageUrl, videoUrl, stepDescription, stepObject.toString());
     }
 
     public void setUi(Recipe recipe) {
@@ -112,7 +112,7 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
             stepObject = stepArray.get(0).getAsJsonObject();
             videoUrl = stepObject.get(getString(R.string.videoURL)).getAsString();
             stepDescription = stepObject.get(getString(R.string.description)).getAsString();
-            saveStepData(videoUrl, stepDescription, stepObject.toString());
+            saveStepData(imageUrl, videoUrl, stepDescription, stepObject.toString());
         } else {
             getStepData();
         }
@@ -149,16 +149,19 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
     public void onStepSelected(int position) {
         stepObject = stepArray.get(position).getAsJsonObject();
 
+
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, StepWidget.class));
 
         stepDescription = stepObject.get(getString(R.string.description)).getAsString();
         videoUrl = stepObject.get(getString(R.string.videoURL)).getAsString();
+        imageUrl = stepObject.get("thumbnailURL").getAsString();
+
 
         //update the widget.
         StepWidget.updateWidgetText(this, appWidgetManager, appWidgetIds, stepDescription);
 
-        saveStepData(videoUrl, stepDescription, stepObject.toString());
+        saveStepData(imageUrl, videoUrl, stepDescription, stepObject.toString());
 
         //if it's two pane change the detail fragment
         if (isTwoPane){
@@ -170,15 +173,17 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
                     .replace(R.id.stepDetailFragment, stepDetailFragment)
                     .commit();
         } else { //otherwise start a new activity.
-            saveStepData(videoUrl, stepDescription, stepString);
+            saveStepData(imageUrl, videoUrl, stepDescription, stepString);
             Intent intent = new Intent(this, StepDetailActivity.class);
             intent.putExtra("RECIPE_NAME", stepObject.toString());
             startActivity(intent);
         }
     }
 
-    public void saveStepData(String videoUrl, String description, String step) {
+    //for easy access.
+    public void saveStepData(String imageUrl, String videoUrl, String description, String step) {
         editor = preferences.edit();
+        editor.putString("IMAGE_URL", imageUrl);
         editor.putString("VIDEO_URL", videoUrl);
         editor.putString("DESCRIPTION", description);
         editor.putString("STEP_OBJECT", step);

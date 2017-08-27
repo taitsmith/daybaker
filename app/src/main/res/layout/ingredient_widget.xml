@@ -5,30 +5,14 @@
     android:orientation="horizontal"
     android:padding="@dimen/widget_margin">
 
-    <ImageView
-        android:contentDescription="@string/ingredient_widget_previous_content_description"
-        android:id="@+id/ingredient_widget_previous_button"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="0.1"
-        android:src="@drawable/exo_controls_previous" />
-
     <TextView
         android:id="@+id/ingredient_widget_text"
-        android:layout_width="0dp"
-        android:layout_weight=".8"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:contentDescription="@string/ingredient_widget_default_text"
         android:text="@string/ingredient_widget_default_text"
         android:textAlignment="center"
         style="@style/WidgetTextView"/>
 
-    <ImageView
-        android:contentDescription="@string/ingredient_widget_next_content_description"
-        android:id="@+id/ingredient_widget_next_button"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight=".1"
-        android:src="@drawable/exo_controls_next" />
 
 </LinearLayout>

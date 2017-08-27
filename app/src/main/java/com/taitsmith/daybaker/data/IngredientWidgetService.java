@@ -12,6 +12,7 @@ import static com.taitsmith.daybaker.activities.StepSummaryActivity.SHARED_PREFS
 
 /**
  * Updates text on the ingredient list widget
+ * As of 27 Aug not being used, will be re-implemented in future.
  */
 
 public class IngredientWidgetService extends IntentService {
@@ -65,7 +66,7 @@ public class IngredientWidgetService extends IntentService {
         editor.putInt("CURRENT_INGREDIENT", nextIngredient);
         editor.apply();
 
-        IngredientWidget.updateWidgetText(this, manager, appWidgetIds, widgetText);
+        IngredientWidget.updateWidgetText(this, manager, appWidgetIds, null);
     }
 
     //display the previous ingredient (or the last)
@@ -87,6 +88,6 @@ public class IngredientWidgetService extends IntentService {
         editor.putInt("CURRENT_INGREDIENT", nextIngredient);
         editor.apply();
 
-        IngredientWidget.updateWidgetText(this, manager, appWidgetIds, widgetText);
+        IngredientWidget.updateWidgetText(this, manager, appWidgetIds, null);
     }
 }

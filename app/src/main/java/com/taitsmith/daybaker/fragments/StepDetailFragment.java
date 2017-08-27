@@ -1,5 +1,6 @@
 package com.taitsmith.daybaker.fragments;
 
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -22,10 +23,13 @@ import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.squareup.picasso.Picasso;
 import com.taitsmith.daybaker.R;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.taitsmith.daybaker.activities.StepSummaryActivity.SHARED_PREFS;
 
 /**
  * Created by tait on 8/19/17
@@ -36,6 +40,7 @@ public class StepDetailFragment extends Fragment {
     private Uri videoUri;
     private String uriString;
     private SimpleExoPlayer player;
+    private SharedPreferences preferences;
 
     @BindView(R.id.step_video_player)
     SimpleExoPlayerView playerView;
@@ -56,6 +61,7 @@ public class StepDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_step, container, false);
         ButterKnife.bind(this, rootView);
+        preferences = getContext().getSharedPreferences(SHARED_PREFS, 0);
 
         stepDetailTv.setText(shortDescription);
         initializePlayer(videoUri);
@@ -80,7 +86,7 @@ public class StepDetailFragment extends Fragment {
             playerView.setPlayer(player);
             String agent = Util.getUserAgent(getContext(), "DayBaker");
 
-            if (videoUri == null || videoUri.toString().equals("")) {
+            if (videoUri == null || videoUri.toString().isEmpty()) {
                 hidePlayer(true);
             } else {
                 hidePlayer(false);
@@ -123,21 +129,33 @@ public class StepDetailFragment extends Fragment {
             uriString = videoUri.toString();
         }
 
-        player.stop();
-        player.release();
-
         outState.putString("VIDEO_URI", uriString);
         outState.putString("DESCRIPTION", shortDescription);
         super.onSaveInstanceState(outState);
     }
 
-    public void hidePlayer(boolean hide) {
+    //hide the player and show the sad android.
+    //maybe the json has an image thumbnail instead,
+    //so we'll show that if it does.
+    public void hidePlayer(boolean hide) throws NullPointerException {
+        String imageUrl = preferences.getString("IMAGE_URL", null);
         if (hide) {
             playerView.setVisibility(View.INVISIBLE);
             noVideoIv.setVisibility(View.VISIBLE);
+            try {
+                if (!imageUrl.isEmpty()) {
+                    showImageThumbnail(imageUrl);
+                }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
         } else {
             playerView.setVisibility(View.VISIBLE);
             noVideoIv.setVisibility(View.INVISIBLE);
         }
+    }
+
+    public void showImageThumbnail(String imageUrl){
+        Picasso.with(getContext()).load(imageUrl).into(noVideoIv);
     }
 }
