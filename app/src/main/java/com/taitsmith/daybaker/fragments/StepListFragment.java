@@ -11,11 +11,12 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.taitsmith.daybaker.R;
-import com.taitsmith.daybaker.activities.StepSummaryActivity;
 import com.taitsmith.daybaker.data.StepListAdapter;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.taitsmith.daybaker.activities.StepSummaryActivity.stepArray;
 
 /**
  * Holds the list of steps.
@@ -23,6 +24,7 @@ import butterknife.ButterKnife;
 
 public class StepListFragment extends Fragment {
     OnStepClickListener listener;
+    private String recipeName;
 
     @BindView(R.id.master_recycler_view)
     GridView stepRecycler;
@@ -59,7 +61,8 @@ public class StepListFragment extends Fragment {
         ButterKnife.bind(this, rootView);
         final GridView gridView = rootView.findViewById(R.id.master_recycler_view);
 
-        final StepListAdapter adapter = new StepListAdapter(getContext(), StepSummaryActivity.stepArray);
+        final StepListAdapter adapter = new StepListAdapter(getContext(), stepArray);
+
 
         gridView.setAdapter(adapter);
 
@@ -73,4 +76,36 @@ public class StepListFragment extends Fragment {
 
         return rootView;
     }
+
+    public void setRecipeName(String name){
+        recipeName = name;
+    }
+
+//    @OnClick(R.id.master_list_next_recipe)
+//    public void nextRecipe() {
+//        SharedPreferences preferences = getContext().getSharedPreferences(SHARED_PREFS, 0);
+//        SharedPreferences.Editor edit = preferences.edit();
+//        edit.putBoolean("NEW_RECIPE", true);
+//        edit.apply();
+//
+//        Intent intent = new Intent(getActivity(), StepSummaryActivity.class);
+//        intent.putExtra("RECIPE_NAME", HelpfulUtils.getNextRecipe(recipeName));
+//        getActivity().finish();
+//        startActivity(intent);
+//
+//    }
+//
+//    @OnClick(R.id.master_list_previous_recipe)
+//    public void previousRecipe() {
+//        getActivity().finish();
+//
+//        SharedPreferences preferences = getContext().getSharedPreferences(SHARED_PREFS, 0);
+//        SharedPreferences.Editor edit = preferences.edit();
+//        edit.putBoolean("NEW_RECIPE", true);
+//        edit.apply();
+//
+//        Intent intent = new Intent(getActivity(), StepSummaryActivity.class);
+//        intent.putExtra("RECIPE_NAME", HelpfulUtils.getPreviousRecipe(recipeName));
+//        startActivity(intent);
+//    }
 }

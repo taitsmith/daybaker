@@ -62,8 +62,8 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
 
         void bind(int position){
             JsonObject ingredient = (ingredientList.get(position)).getAsJsonObject();
-            String measure = ingredient.get("measure").toString();
-            String amount = ingredient.get("quantity").toString();
+            String measure = HelpfulUtils.removeQuotes(ingredient.get("measure").toString());
+            String amount = HelpfulUtils.removeQuotes(ingredient.get("quantity").toString());
             String measuredAmount;
 
             //because 5 UNIT looks weird.
@@ -73,7 +73,7 @@ public class IngredientAdapter extends RecyclerView.Adapter<IngredientAdapter.In
                 measuredAmount = amount.concat(measure);
             }
             ingredientMeasure.setText(measuredAmount);
-            ingredientName.setText(ingredient.get("ingredient").toString());
+            ingredientName.setText(HelpfulUtils.removeQuotes(ingredient.get("ingredient").toString()));
 
         }
     }

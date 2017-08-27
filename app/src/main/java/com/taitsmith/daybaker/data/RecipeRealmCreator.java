@@ -1,6 +1,7 @@
 package com.taitsmith.daybaker.data;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -53,6 +54,7 @@ public class RecipeRealmCreator {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 showError = false;
+                int i = 0;
 
                 realm = Realm.getInstance(realmConfiguration);
                 realm.beginTransaction();
@@ -64,8 +66,12 @@ public class RecipeRealmCreator {
                     Recipe recipe = realm.createObject(Recipe.class);
                     recipe.setIngredients(element.getAsJsonObject().get("ingredients").toString());
                     recipe.setSteps(element.getAsJsonObject().get("steps").toString());
-                    recipe.setName(element.getAsJsonObject().get("name").toString());
+                    recipe.setName(HelpfulUtils.removeQuotes(element.getAsJsonObject().
+                            get("name").toString()));
                     recipe.setServings(element.getAsJsonObject().get("servings").getAsInt());
+                    recipe.setPosition(i);
+                    i++;
+                    Log.d("NAME ", recipe.getName());
                 }
                 realm.commitTransaction();
                 realm.close();

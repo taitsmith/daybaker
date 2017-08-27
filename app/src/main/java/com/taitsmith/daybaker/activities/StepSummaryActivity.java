@@ -9,13 +9,17 @@ import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.oguzdev.circularfloatingactionmenu.library.FloatingActionMenu;
+import com.oguzdev.circularfloatingactionmenu.library.SubActionButton;
 import com.taitsmith.daybaker.R;
+import com.taitsmith.daybaker.data.HelpfulUtils;
 import com.taitsmith.daybaker.data.Recipe;
 import com.taitsmith.daybaker.data.StepWidget;
 import com.taitsmith.daybaker.fragments.StepDetailFragment;
@@ -23,7 +27,6 @@ import com.taitsmith.daybaker.fragments.StepListFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
@@ -33,17 +36,22 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
     private Realm realm;
     private Recipe recipe;
     private FragmentManager fragmentManager;
-    private StepListFragment stepListFragment;
     private StepDetailFragment stepDetailFragment;
     private JsonObject stepObject;
     private SharedPreferences preferences;
     private boolean isTwoPane;
     private JsonParser jsonParser;
+    private FloatingActionMenu actionMenu;
+    private SharedPreferences.Editor editor;
 
     public String videoUrl, stepDescription, stepString;
 
     public static JsonArray stepArray;
     public static final String SHARED_PREFS = "sharedPrefs";
+
+    StepListFragment stepListFragment;
+    SubActionButton.Builder itemBuilder;
+    ImageView nextRecipe, previousRecipe, homeView;
 
     @BindView(R.id.stepSummaryDescription)
     TextView summaryDescription;
@@ -59,8 +67,6 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
         setContentView(R.layout.activity_step_summary);
         ButterKnife.bind(this);
 
-        stepListFragment = new StepListFragment();
-        stepDetailFragment = new StepDetailFragment();
         realm = Realm.getInstance(realmConfiguration);
         fragmentManager = getSupportFragmentManager();
         jsonParser = new JsonParser();
@@ -70,20 +76,16 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
         //selected recipe was sent with us;
         if (getIntent().hasExtra("RECIPE_NAME")) {
             recipeName = getIntent().getStringExtra("RECIPE_NAME");
-        } else {
+        } else if (preferences.getBoolean("NEW_RECIPE", true)){
             recipeName = preferences.getString("RECIPE_NAME", null);
         }
 
         //set the basic description text to include the recipe name.
-        summaryDescription.setText(getString(R.string.step_summary_description, recipeName));
-
-        //do a real query and get the recipe object.
         RealmResults<Recipe> results = realm.where(Recipe.class)
                 .equalTo("name", recipeName)
                 .findAll();
-        recipe = results.first();
 
-        setUi();
+        setUi(results.first());
     }
 
     @Override
@@ -98,17 +100,20 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
         saveStepData(videoUrl, stepDescription, stepObject.toString());
     }
 
-    public void setUi() {
-        stepArray = jsonParser.parse(recipe.getSteps()).getAsJsonArray();
-        Log.d("LOG ", stepArray.toString());
+    public void setUi(Recipe recipe) {
+        this.recipe = recipe;
+        stepListFragment = new StepListFragment();
+        stepDetailFragment = new StepDetailFragment();
 
-        //if the user has selected a new recipe show the first step
-        if (preferences.getBoolean("NEW_RECIPE", false)){
+        stepArray = jsonParser.parse(recipe.getSteps()).getAsJsonArray();
+        summaryDescription.setText(getString(R.string.step_summary_description, recipe.getName()));
+
+        if (preferences.getBoolean("NEW_RECIPE", false)) {
             stepObject = stepArray.get(0).getAsJsonObject();
             videoUrl = stepObject.get(getString(R.string.videoURL)).getAsString();
             stepDescription = stepObject.get(getString(R.string.description)).getAsString();
+            saveStepData(videoUrl, stepDescription, stepObject.toString());
         } else {
-            stepObject = stepArray.get(0).getAsJsonObject();
             getStepData();
         }
 
@@ -122,13 +127,13 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
             intent.putExtra("VIDEO_URL", videoUrl);
             startActivity(intent);
         }
-        
+
         //do some stuff if it's two-pane
         if (isTwoPane) {
             stepDetailFragment.setVideoUri(videoUrl);
             stepDetailFragment.setDescription(stepDescription);
             fragmentManager.beginTransaction()
-                    .replace(R.id.stepListFragment, stepListFragment)
+                    .replace(R.id.stepListFragment, stepListFragment, "STEP_LIST_FRAGMENT")
                     .replace(R.id.stepDetailFragment, stepDetailFragment)
                     .commit();
         } else {
@@ -137,6 +142,7 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
                     .replace(R.id.stepListFragment, stepListFragment)
                     .commit();
         }
+        setFab();
     }
 
     @Override
@@ -151,6 +157,8 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
 
         //update the widget.
         StepWidget.updateWidgetText(this, appWidgetManager, appWidgetIds, stepDescription);
+
+        saveStepData(videoUrl, stepDescription, stepObject.toString());
 
         //if it's two pane change the detail fragment
         if (isTwoPane){
@@ -170,7 +178,7 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
     }
 
     public void saveStepData(String videoUrl, String description, String step) {
-        SharedPreferences.Editor editor = preferences.edit();
+        editor = preferences.edit();
         editor.putString("VIDEO_URL", videoUrl);
         editor.putString("DESCRIPTION", description);
         editor.putString("STEP_OBJECT", step);
@@ -179,8 +187,7 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
         editor.apply();
     }
     public void getStepData() {
-        stepObject = jsonParser.parse(preferences.getString("STEP_OBJECT", null))
-                    .getAsJsonObject();
+        stepObject = jsonParser.parse(preferences.getString("STEP_OBJECT", null)).getAsJsonObject();
         videoUrl = preferences.getString("VIDEO_URL", null);
         stepDescription = preferences.getString("DESCRIPTION", null);
         recipeName = preferences.getString("RECIPE_NAME", null);
@@ -192,9 +199,55 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
         realm.close();
     }
 
-    @OnClick(R.id.returnHomeFab)
-    public void returnHome(){
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+    private void setFab(){
+        final SubActionButton nextButton, previousButton, homeButton;
+        itemBuilder = new SubActionButton.Builder(this);
+        nextRecipe = new ImageView(this);
+        previousRecipe = new ImageView(this);
+        homeView = new ImageView(this);
+        homeView.setImageDrawable(getResources().getDrawable(R.drawable.ic_arrow_upward_black_36dp));
+        nextRecipe.setImageDrawable(getResources().getDrawable(R.drawable.ic_skip_next_black_36dp));
+        previousRecipe.setImageDrawable(getResources().getDrawable(R.drawable.ic_skip_previous_black_36dp));
+        nextButton = itemBuilder.setContentView(nextRecipe).build();
+        previousButton = itemBuilder.setContentView(previousRecipe).build();
+        homeButton = itemBuilder.setContentView(homeView).build();
+
+        actionMenu = new FloatingActionMenu.Builder(this)
+                .addSubActionView(nextButton)
+                .addSubActionView(homeButton)
+                .addSubActionView(previousButton)
+                .attachTo(returnHome)
+                .build();
+
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                editor = preferences.edit();
+                editor.putBoolean("NEW_RECIPE", true);
+                editor.apply();
+
+                actionMenu.close(true);
+                setUi(HelpfulUtils.getNextRecipe(recipe.getName()));
+            }
+        });
+
+        previousButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                editor = preferences.edit();
+                editor.putBoolean("NEW_RECIPE", true);
+                editor.apply();
+                actionMenu.close(true);
+                setUi(HelpfulUtils.getPreviousRecipe(recipe.getName()));
+            }
+        });
+
+        homeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(view.getContext(), MainActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }

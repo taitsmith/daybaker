@@ -7,21 +7,17 @@ import android.support.annotation.VisibleForTesting;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.widget.Button;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.taitsmith.daybaker.R;
+import com.taitsmith.daybaker.data.HelpfulUtils;
 import com.taitsmith.daybaker.data.IngredientAdapter;
-import com.taitsmith.daybaker.data.IngredientWidgetService;
 import com.taitsmith.daybaker.data.Recipe;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -83,7 +79,7 @@ public class IngredientSummaryActivity extends AppCompatActivity {
         adapter = new IngredientAdapter(ingredientsArray.size(), ingredientsArray);
         ingredientRecycler.setAdapter(adapter);
 
-
+        HelpfulUtils.getStringsForIngredientWidget(recipeName);
     }
 
     @OnClick(R.id.continueButton)
@@ -91,33 +87,6 @@ public class IngredientSummaryActivity extends AppCompatActivity {
         Intent intent = new Intent(this, StepSummaryActivity.class);
         intent.putExtra("RECIPE_NAME", recipeName);
         startActivity(intent);
-    }
-
-    public void getIngredientArray(JsonArray ingredientsArray) {
-        ListIterator<String> iterator = ingredientList.listIterator();
-
-        for (JsonElement jsonElement : ingredientsArray) {
-            JsonObject object = jsonElement.getAsJsonObject();
-            object = object.get("nameValuePairs").getAsJsonObject();
-            String s = object.get("ingredient").getAsString();
-            iterator.add(s);
-        }
-        updateSharedPrefs((ArrayList<String>) ingredientList);
-    }
-
-    public void updateSharedPrefs(ArrayList<String> list) {
-        StringBuilder builder = new StringBuilder();
-        for (String s : list){
-            builder.append(s).append("-");
-        }
-
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("INGREDIENTS", builder.toString());
-        editor.putInt("CURRENT_INGREDIENT", -1);
-        Log.d("LOG ", builder.toString());
-        editor.apply();
-        
-        IngredientWidgetService.startActionNextIngredient(this);
     }
 }
 

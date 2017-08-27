@@ -49,7 +49,6 @@ public class StepDetailFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
     }
 
     @Nullable
@@ -107,16 +106,25 @@ public class StepDetailFragment extends Fragment {
     public void onPause() {
         super.onPause();
         player.stop();
+        player.release();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        initializePlayer(videoUri);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-
         if (videoUri == null){
             uriString = "";
         } else {
             uriString = videoUri.toString();
         }
+
+        player.stop();
+        player.release();
 
         outState.putString("VIDEO_URI", uriString);
         outState.putString("DESCRIPTION", shortDescription);
