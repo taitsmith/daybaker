@@ -7,7 +7,7 @@ import io.realm.RealmObject;
  */
 
 public class Recipe extends RealmObject{
-    private String name, ingredients, steps;
+    private String name, ingredients, steps, imageUrl;
     private int servings, position;
 
     public int getServings() {
@@ -48,5 +48,13 @@ public class Recipe extends RealmObject{
 
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

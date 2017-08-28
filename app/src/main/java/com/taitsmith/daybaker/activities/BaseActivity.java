@@ -3,9 +3,11 @@ package com.taitsmith.daybaker.activities;
 import android.app.Application;
 
 import com.taitsmith.daybaker.data.RecipeRealmCreator;
+import com.taitsmith.daybaker.data.RecipeRealmMigration;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import io.realm.exceptions.RealmMigrationNeededException;
 
 /**
  * Sets up Realm etc.
@@ -17,17 +19,27 @@ public class BaseActivity extends Application {
 
     @Override
     public void onCreate() {
+        RecipeRealmCreator creator = new RecipeRealmCreator();
+
         super.onCreate();
         Realm.init(this);
 
-        realmConfiguration = new RealmConfiguration.Builder()
-                .name("recipeRealm.recipeRealm")
-                .build();
+        try {
+            realmConfiguration = new RealmConfiguration.Builder()
+                    .name("recipeRealm.recipeRealm")
+                    .build();
 
-        recipeRealm = Realm.getInstance(realmConfiguration);
+            recipeRealm = Realm.getInstance(realmConfiguration);
+        } catch (RealmMigrationNeededException e) { // updated realm schema
+            realmConfiguration = new RealmConfiguration.Builder()
+                    .schemaVersion(2)
+                    .migration(new RecipeRealmMigration())
+                    .build();
+            recipeRealm = Realm.getInstance(realmConfiguration);
+            creator.downloadRecipeData(this);
+        }
 
         if (recipeRealm.isEmpty()) {
-            RecipeRealmCreator creator = new RecipeRealmCreator();
             creator.downloadRecipeData(this);
         }
     }

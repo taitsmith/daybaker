@@ -5,7 +5,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,18 +66,14 @@ public class StepDetailFragment extends Fragment {
             playerPosition = preferences.getLong("PLAYER_POSITION", C.TIME_UNSET);
             shortDescription = savedInstanceState.getString("DESCRIPTION");
             setVideoUri(savedInstanceState.getString("VIDEO_URI"));
-            Log.d("TIME LOG ", Long.toString(playerPosition));
         }
 
         initializePlayer(videoUri);
 
         stepDetailTv.setText(shortDescription);
 
-        Log.d("ON CREATE", " 1");
         return rootView;
     }
-
-
 
     public void setDescription(String shortDesc) {
         shortDescription = shortDesc;
@@ -108,8 +103,6 @@ public class StepDetailFragment extends Fragment {
                 player.prepare(source);
                 player.setPlayWhenReady(true);
                 playerView.hideController();
-
-                Log.d("TIME LOG II", Long.toString(playerPosition));
             }
         }
     }

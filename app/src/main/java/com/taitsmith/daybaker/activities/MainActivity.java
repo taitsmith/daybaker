@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity
         }
         hideUi(false);
 
-        recipeAdapter = new RecipeAdapter(recipes.size(), recipes, this);
+        recipeAdapter = new RecipeAdapter(recipes.size(), recipes, this, this);
         recipeRecycler.setAdapter(recipeAdapter);
     }
 

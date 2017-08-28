@@ -71,6 +71,7 @@ public class RecipeRealmCreator {
                             get("name").toString()));
                     recipe.setServings(element.getAsJsonObject().get("servings").getAsInt());
                     recipe.setPosition(i);
+                    recipe.setImageUrl(element.getAsJsonObject().get("image").getAsString());
                     i++;
                 }
                 realm.commitTransaction();

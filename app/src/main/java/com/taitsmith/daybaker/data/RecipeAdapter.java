@@ -5,8 +5,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
 import com.taitsmith.daybaker.R;
 
 import io.realm.RealmResults;
@@ -18,16 +20,19 @@ import io.realm.RealmResults;
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder> {
     private int numberItems;
     private RealmResults<Recipe> recipes;
+    private Context context;
     final private ListItemClickListener listener;
 
     public interface ListItemClickListener{
         void onListItemClick(int itemIndex);
     }
 
-    public RecipeAdapter(int items, RealmResults<Recipe> realmResults, ListItemClickListener listener){
+    public RecipeAdapter(int items, RealmResults<Recipe> realmResults,
+                         ListItemClickListener listener, Context context){
         numberItems = items;
         recipes = realmResults;
         this.listener = listener;
+        this.context = context;
     }
 
     @Override
@@ -46,6 +51,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
         final TextView nameTv;
         final TextView servingsTv;
+        final ImageView recipeImage;
 
         @Override
         public void onClick(View view) {
@@ -57,6 +63,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             super(recipeView);
             nameTv = recipeView.findViewById(R.id.recipe_name_tv);
             servingsTv = recipeView.findViewById(R.id.recipe_servings_tv);
+            recipeImage = recipeView.findViewById(R.id.recipe_image_view);
             itemView.setOnClickListener(this);
         }
 
@@ -68,6 +75,15 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
             nameTv.setText(recipe.getName());
             servingsTv.setText(servingString);
+
+            try {
+                if (!recipe.getImageUrl().isEmpty()) {
+                    Picasso.with(context).load(recipe.getImageUrl()).into(recipeImage);
+                    recipeImage.setVisibility(View.VISIBLE);
+                }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
         }
     }
 
