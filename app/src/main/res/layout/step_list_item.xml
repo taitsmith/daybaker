@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/step_list_item_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/step_list_item_top_bottom"
+        android:paddingBottom="@dimen/step_list_item_top_bottom"
+        android:textSize="@dimen/step_list_item_text_size"
+        android:paddingLeft="@dimen/step_list_item_left_right"
+        android:paddingStart="@dimen/step_list_item_left_right"
+        android:paddingRight="@dimen/step_list_item_left_right"
+        android:paddingEnd="@dimen/step_list_item_left_right"/>
+
+    <ImageView
+        android:contentDescription="@string/step_thumbnail_description"
+        android:id="@+id/step_list_item_thumbnail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+
+</LinearLayout>

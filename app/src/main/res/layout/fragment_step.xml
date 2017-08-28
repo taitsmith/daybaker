@@ -15,7 +15,8 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         android:layout_margin="@dimen/margin_padding"
-        app:layout_constraintBottom_toTopOf="@+id/guideline" />
+        app:layout_constraintBottom_toTopOf="@+id/guideline"
+        android:contentDescription="@string/video_player_description"/>
 
     <ImageView
         android:id="@+id/noVideoImageView"

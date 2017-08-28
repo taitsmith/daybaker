@@ -5,12 +5,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.LoadControl;
@@ -41,6 +43,7 @@ public class StepDetailFragment extends Fragment {
     private String uriString;
     private SimpleExoPlayer player;
     private SharedPreferences preferences;
+    private long playerPosition;
 
     @BindView(R.id.step_video_player)
     SimpleExoPlayerView playerView;
@@ -51,12 +54,6 @@ public class StepDetailFragment extends Fragment {
 
     public StepDetailFragment(){}
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -64,11 +61,24 @@ public class StepDetailFragment extends Fragment {
         ButterKnife.bind(this, rootView);
         preferences = getContext().getSharedPreferences(SHARED_PREFS, 0);
 
-        stepDetailTv.setText(shortDescription);
+        //for some reason there's a weird issue with getting the player position
+        //from savedInstanceState. This works.
+        if (savedInstanceState != null) {
+            playerPosition = preferences.getLong("PLAYER_POSITION", C.TIME_UNSET);
+            shortDescription = savedInstanceState.getString("DESCRIPTION");
+            setVideoUri(savedInstanceState.getString("VIDEO_URI"));
+            Log.d("TIME LOG ", Long.toString(playerPosition));
+        }
+
         initializePlayer(videoUri);
 
+        stepDetailTv.setText(shortDescription);
+
+        Log.d("ON CREATE", " 1");
         return rootView;
     }
+
+
 
     public void setDescription(String shortDesc) {
         shortDescription = shortDesc;
@@ -94,9 +104,12 @@ public class StepDetailFragment extends Fragment {
 
                 MediaSource source = new ExtractorMediaSource(videoUri, new DefaultDataSourceFactory(
                         getContext(), agent), new DefaultExtractorsFactory(), null, null);
+                player.seekTo(playerPosition);
                 player.prepare(source);
                 player.setPlayWhenReady(true);
                 playerView.hideController();
+
+                Log.d("TIME LOG II", Long.toString(playerPosition));
             }
         }
     }
@@ -104,15 +117,22 @@ public class StepDetailFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        player.stop();
-        player.release();
-        player = null;
+        SharedPreferences.Editor editor= preferences.edit();
+
+        if (player != null) {
+            editor.putLong("PLAYER_POSITION", player.getContentPosition());
+            player.release();
+            player = null;
+        }
+        editor.apply();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        initializePlayer(videoUri);
+        if (videoUri != null) {
+            initializePlayer(videoUri);
+        }
     }
 
     @Override
@@ -122,7 +142,7 @@ public class StepDetailFragment extends Fragment {
         } else {
             uriString = videoUri.toString();
         }
-
+        outState.putLong("PLAYER_POSITION", playerPosition);
         outState.putString("VIDEO_URI", uriString);
         outState.putString("DESCRIPTION", shortDescription);
         super.onSaveInstanceState(outState);

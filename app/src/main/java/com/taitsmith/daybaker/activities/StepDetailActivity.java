@@ -10,6 +10,7 @@ import com.google.gson.JsonParser;
 import com.taitsmith.daybaker.R;
 import com.taitsmith.daybaker.fragments.StepDetailFragment;
 
+import static com.taitsmith.daybaker.R.id.stepDetailFragment;
 import static com.taitsmith.daybaker.activities.StepSummaryActivity.SHARED_PREFS;
 
 public class StepDetailActivity extends AppCompatActivity {
@@ -21,9 +22,14 @@ public class StepDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_step_detail);
         parser = new JsonParser();
-        StepDetailFragment detailFragment = new StepDetailFragment();
+        StepDetailFragment detailFragment = (StepDetailFragment)
+                getSupportFragmentManager().findFragmentByTag("STEP_DETAIL_FRAGMENT");
         FragmentManager manager = getSupportFragmentManager();
         SharedPreferences preferences = getSharedPreferences(SHARED_PREFS, 0);
+
+        if (detailFragment == null) {
+            detailFragment = new StepDetailFragment();
+        }
 
         if (getIntent().hasExtra("VIDEO_URL")){
             detailFragment.setDescription(preferences.getString("DESCRIPTION", null));
@@ -35,7 +41,7 @@ public class StepDetailActivity extends AppCompatActivity {
             detailFragment.setDescription(step.get(getString(R.string.description)).getAsString());
         }
         manager.beginTransaction()
-                .replace(R.id.stepDetailFragment, detailFragment)
+                .replace(stepDetailFragment, detailFragment, "STEP_DETAIL_FRAGMENT")
                 .commit();
     }
 }

@@ -44,6 +44,7 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
     private FloatingActionMenu actionMenu;
     private SharedPreferences.Editor editor;
 
+
     public String videoUrl, stepDescription, stepString, imageUrl;
 
     public static JsonArray stepArray;
@@ -103,12 +104,17 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
     public void setUi(Recipe recipe) {
         this.recipe = recipe;
         stepListFragment = new StepListFragment();
-        stepDetailFragment = new StepDetailFragment();
+        stepDetailFragment = (StepDetailFragment)
+                fragmentManager.findFragmentByTag("STEP_DETAIL_FRAGMENT");
 
         stepArray = jsonParser.parse(recipe.getSteps()).getAsJsonArray();
         summaryDescription.setText(getString(R.string.step_summary_description, recipe.getName()));
 
         if (preferences.getBoolean("NEW_RECIPE", false)) {
+//            fragmentManager.beginTransaction()
+//                    .detach(stepDetailFragment)
+//                    .attach(stepDetailFragment)
+//                    .commit();
             stepObject = stepArray.get(0).getAsJsonObject();
             videoUrl = stepObject.get(getString(R.string.videoURL)).getAsString();
             stepDescription = stepObject.get(getString(R.string.description)).getAsString();
@@ -130,16 +136,21 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
 
         //do some stuff if it's two-pane
         if (isTwoPane) {
-            stepDetailFragment.setVideoUri(videoUrl);
+            if (stepDetailFragment == null) {
+                stepDetailFragment = new StepDetailFragment();
+            }
+
             stepDetailFragment.setDescription(stepDescription);
+            stepDetailFragment.setVideoUri(videoUrl);
+
             fragmentManager.beginTransaction()
-                    .replace(R.id.stepListFragment, stepListFragment, "STEP_LIST_FRAGMENT")
-                    .replace(R.id.stepDetailFragment, stepDetailFragment)
+                    .replace(R.id.stepListFragment, stepListFragment)
+                    .replace(R.id.stepDetailFragment, stepDetailFragment, "STEP_DETAIL_FRAGMENT")
                     .commit();
         } else {
             //do some different stuff if it's single pane
-            fragmentManager.beginTransaction()
-                    .replace(R.id.stepListFragment, stepListFragment)
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.stepListFragment, stepListFragment)
                     .commit();
         }
         setFab();
@@ -170,7 +181,8 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
             stepDetailFragment.setVideoUri(videoUrl);
 
             fragmentManager.beginTransaction()
-                    .replace(R.id.stepDetailFragment, stepDetailFragment)
+                    .replace(R.id.stepDetailFragment, stepDetailFragment, "STEP_DETAIL_FRAGMENT")
+                    .addToBackStack("STEP_DETAIL_FRAGMENT")
                     .commit();
         } else { //otherwise start a new activity.
             saveStepData(imageUrl, videoUrl, stepDescription, stepString);
@@ -254,5 +266,13 @@ public class StepSummaryActivity extends AppCompatActivity implements StepListFr
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(this, IngredientSummaryActivity.class);
+        intent.putExtra("recipe_name", recipe.getName());
+        startActivity(intent);
     }
 }
