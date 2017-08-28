@@ -3,4 +3,4 @@ An app for baking in the daytime (it will function at nighttime as well). Gets s
 presents recipes in a recycler view. Recipes can be selected to view various steps, selecting a step will provide more
 information as well as videos (if the video exists).
 
-Uses Realm, OkHttp, ExoPlayer.
+Uses Realm, Gson, OkHttp, ExoPlayer, Picasso and https://github.com/oguzbilgener/CircularFloatingActionMenu
